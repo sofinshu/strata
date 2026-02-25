@@ -981,7 +981,7 @@
             </div>
 
             <div class="command-results" id="commandResults"
-                style="display: flex; flex-direction: column; gap: 1rem; max-height: 500px; overflow-y: auto; padding-right: 10px;">
+                style="display: flex; flex-direction: column; gap: 1rem; max-height: 650px; overflow-y: auto; padding-right: 10px;">
                 <!-- Commands injected by JS -->
             </div>
         </div>
@@ -1610,8 +1610,13 @@
                 // Expand it
                 commandItem.classList.add('expanded');
                 btn.classList.add('active');
-                // Calculate total scroll height of the inner content
-                previewPanel.style.maxHeight = previewPanel.scrollHeight + 'px';
+                // Calculate total scroll height of the inner content, plus a buffer
+                previewPanel.style.maxHeight = (previewPanel.scrollHeight + 80) + 'px';
+
+                // Smooth scroll into view so the user doesn't miss the expanded content
+                setTimeout(() => {
+                    previewPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }, 300);
             }
         };
 
