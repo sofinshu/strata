@@ -46,9 +46,23 @@
             height: 100vh;
             z-index: -1;
             overflow: hidden;
-            background: radial-gradient(circle at 50% -20%, rgba(244, 114, 182, 0.15), transparent 40%),
-                radial-gradient(circle at -20% 50%, rgba(59, 130, 246, 0.1), transparent 40%),
-                radial-gradient(circle at 120% 80%, rgba(139, 92, 246, 0.15), transparent 40%);
+            background: radial-gradient(circle at var(--mouseX, 50%) var(--mouseY, -20%), rgba(244, 114, 182, 0.15), transparent 40%),
+                radial-gradient(circle at calc(100% - var(--mouseX, 120%)) calc(100% - var(--mouseY, 80%)), rgba(139, 92, 246, 0.15), transparent 40%),
+                radial-gradient(circle at -20% 50%, rgba(59, 130, 246, 0.1), transparent 50%);
+            animation: breathe 10s ease-in-out infinite alternate;
+            transition: background 0.5s ease-out;
+        }
+
+        @keyframes breathe {
+            0% {
+                opacity: 0.8;
+                transform: scale(1);
+            }
+
+            100% {
+                opacity: 1;
+                transform: scale(1.05);
+            }
         }
 
         /* Navigation */
@@ -94,10 +108,26 @@
             text-decoration: none;
             font-weight: 600;
             transition: color 0.3s ease;
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 0;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            transition: width 0.3s ease;
         }
 
         .nav-links a:hover {
             color: var(--text-main);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
         }
 
         .btn {
@@ -539,6 +569,50 @@
             }
         }
 
+        @keyframes typing {
+            0% {
+                content: ".";
+            }
+
+            33% {
+                content: "..";
+            }
+
+            66% {
+                content: "...";
+            }
+
+            100% {
+                content: ".";
+            }
+        }
+
+        .discord-mockup.loading .discord-embed {
+            display: none;
+        }
+
+        .discord-mockup.loading .discord-msg::after {
+            content: "BOT is typing.";
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-style: italic;
+            position: absolute;
+            bottom: 10px;
+            left: 60px;
+            animation: typing 1.5s infinite;
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
         @keyframes gradientShift {
             0% {
                 background-position: 0% center;
@@ -804,7 +878,7 @@
     </section>
 
     <!-- NEW LIVE STATS SECTION -->
-    <section id="live-stats" class="section"
+    <section id="live-stats" class="section reveal"
         style="background: rgba(255,255,255,0.01); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
         <div class="section-header">
             <h2 class="section-title text-gradient">Live Platform Dashboard</h2>
@@ -813,19 +887,19 @@
 
         <div class="features-grid"
             style="grid-template-columns: repeat(3, 1fr); gap: 1rem; max-width: 1000px; margin: 0 auto;">
-            <div class="feature-card" style="text-align: center; padding: 2rem;">
+            <div class="feature-card reveal" style="text-align: center; padding: 2rem; transition-delay: 0.1s;">
                 <h3
                     style="color: var(--text-muted); font-size: 1rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5rem;">
                     Total Servers</h3>
                 <div id="stat-servers" style="font-size: 3rem; font-weight: 800; color: white;">...</div>
             </div>
-            <div class="feature-card" style="text-align: center; padding: 2rem;">
+            <div class="feature-card reveal" style="text-align: center; padding: 2rem; transition-delay: 0.2s;">
                 <h3
                     style="color: var(--text-muted); font-size: 1rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5rem;">
                     Registered Staff</h3>
                 <div id="stat-staff" style="font-size: 3rem; font-weight: 800; color: var(--primary);">...</div>
             </div>
-            <div class="feature-card" style="text-align: center; padding: 2rem;">
+            <div class="feature-card reveal" style="text-align: center; padding: 2rem; transition-delay: 0.3s;">
                 <h3
                     style="color: var(--text-muted); font-size: 1rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5rem;">
                     Tickets Handled</h3>
@@ -834,7 +908,7 @@
         </div>
     </section>
 
-    <section id="features" class="section">
+    <section id="features" class="section reveal">
         <div class="section-header">
             <h2 class="section-title text-gradient">Core Features</h2>
             <p style="color: var(--text-muted); max-width: 600px; margin: 0 auto;">Everything you need to manage your
@@ -842,20 +916,23 @@
         </div>
 
         <div class="features-grid">
-            <div class="feature-card">
-                <div class="icon-wrapper">🎫</div>
+            <div class="feature-card reveal" style="transition-delay: 0.1s;">
+                <div class="icon-wrapper" style="transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);">🎫
+                </div>
                 <h3>Advanced Ticket System</h3>
                 <p>Allow users to report staff or send feedback. Guild admins can easily claim, manage, and close
                     tickets with beautiful UI panels and direct DM routing.</p>
             </div>
-            <div class="feature-card">
-                <div class="icon-wrapper">📝</div>
+            <div class="feature-card reveal" style="transition-delay: 0.2s;">
+                <div class="icon-wrapper" style="transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);">📝
+                </div>
                 <h3>Staff & Helper Applications</h3>
                 <p>Deploy application panels instantly. Review, accept, or deny applications via an interactive workflow
                     sent directly to server management.</p>
             </div>
-            <div class="feature-card">
-                <div class="icon-wrapper">⏱️</div>
+            <div class="feature-card reveal" style="transition-delay: 0.3s;">
+                <div class="icon-wrapper" style="transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);">⏱️
+                </div>
                 <h3>Shift Logging</h3>
                 <p>Track staff activity accurately. Users can start their shift (`/shift_start`), end their shift, and
                     admins can view detailed statistics and shift hours.</p>
@@ -926,9 +1003,27 @@
             <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem;">
                 <span style="font-weight: bold; color: var(--text-muted);">1</span>
                 <input type="range" id="staffSlider" min="1" max="100" value="10"
-                    style="flex: 1; accent-color: var(--primary); cursor: pointer;">
+                    style="flex: 1; -webkit-appearance: none; appearance: none; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; outline: none; transition: background 0.3s;">
                 <span style="font-weight: bold; color: var(--text-muted);">100+</span>
             </div>
+
+            <style>
+                #staffSlider::-webkit-slider-thumb {
+                    -webkit-appearance: none;
+                    appearance: none;
+                    width: 24px;
+                    height: 24px;
+                    border-radius: 50%;
+                    background: linear-gradient(135deg, var(--primary), var(--secondary));
+                    cursor: pointer;
+                    box-shadow: 0 0 15px rgba(244, 114, 182, 0.5);
+                    transition: transform 0.2s;
+                }
+
+                #staffSlider::-webkit-slider-thumb:hover {
+                    transform: scale(1.2);
+                }
+            </style>
 
             <div style="display: flex; justify-content: space-around; flex-wrap: wrap; gap: 1rem;">
                 <div style="background: rgba(0,0,0,0.5); padding: 1rem; border-radius: 8px; flex: 1; min-width: 150px;">
@@ -1063,6 +1158,75 @@
     </footer>
 
     <script>
+        // Track mouse movement for background parallax
+        document.addEventListener('mousemove', (e) => {
+            const x = (e.clientX / window.innerWidth) * 100;
+            const y = (e.clientY / window.innerHeight) * 100;
+            document.documentElement.style.setProperty('--mouseX', x + '%');
+            document.documentElement.style.setProperty('--mouseY', y + '%');
+        });
+
+        // 3D Card Hover Tilt Effect
+        document.querySelectorAll('.feature-card, .price-card, .dashboard-preview').forEach(card => {
+            card.addEventListener('mousemove', e => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+
+                const rotateX = ((y - centerY) / centerY) * -5;
+                const rotateY = ((x - centerX) / centerX) * 5;
+
+                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+
+                // Icon bounce effect
+                const icon = card.querySelector('.icon-wrapper');
+                if (icon) {
+                    icon.style.transform = 'translateY(-5px) scale(1.1)';
+                }
+            });
+
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = '';
+
+                const icon = card.querySelector('.icon-wrapper');
+                if (icon) {
+                    icon.style.transform = '';
+                }
+            });
+        });
+
+        // Intersection Observer for scroll animations
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.15
+        };
+
+        const observer = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+        // Simulated Discord mockup typing animation
+        setTimeout(() => {
+            const mockup = document.querySelector('.discord-mockup');
+            if (mockup) {
+                mockup.classList.add('loading');
+                setTimeout(() => {
+                    mockup.classList.remove('loading');
+                }, 2500);
+            }
+        }, 1000);
+
         // Navbar blur on scroll
         window.addEventListener('scroll', () => {
             const nav = document.getElementById('navbar');
@@ -1254,6 +1418,9 @@
             staffSlider.addEventListener('input', (e) => {
                 const val = parseInt(e.target.value);
                 calcStaffCount.innerText = val + (val === 100 ? '+' : '');
+
+                const pct = ((val - 1) / 99) * 100;
+                e.target.style.background = `linear-gradient(to right, var(--primary) ${pct}%, rgba(255,255,255,0.1) ${pct}%)`;
 
                 let tier = 'Base (Free)';
                 let color = 'var(--text-muted)';
