@@ -1394,7 +1394,15 @@
         });
 
         // Command Search Functionality
-        let commands = [];
+        let commands = [
+            // Fallback mock commands in case bot API is offline
+            { name: 'report', desc: 'Generate a comprehensive weekly staff activity report.', tier: 'Premium' },
+            { name: 'stats', desc: 'View live server metrics and member activity statistics.', tier: 'Free' },
+            { name: 'ticket', desc: 'Create a new support ticket category with custom transcripts.', tier: 'Free' },
+            { name: 'promote', desc: 'Initiate a multi-channel auto-promotion campaign.', tier: 'Enterprise' },
+            { name: 'apply', desc: 'Open a modal application panel for staff recruitment.', tier: 'Premium' },
+            { name: 'verify', desc: 'Setup an advanced captcha verification gate for new members.', tier: 'Free' }
+        ];
         const searchInput = document.getElementById('commandSearchInput');
         const resultsContainer = document.getElementById('commandResults');
 
@@ -1408,11 +1416,15 @@
                     searchInput.placeholder = `Search all ${commands.length} commands...`;
                     renderCommands(); // Immediately render on success
                 } else {
-                    resultsContainer.innerHTML = '<div style="color: var(--text-muted); text-align: center; padding: 1rem;">Failed to load server commands. Bot might be offline.</div>';
+                    // Fallback to offline mock data
+                    searchInput.placeholder = `Search demo commands... (Bot Offline)`;
+                    renderCommands();
                 }
             } catch (err) {
-                console.error("Error fetching live commands:", err);
-                resultsContainer.innerHTML = '<div style="color: var(--text-muted); text-align: center; padding: 1rem;">Failed to load server commands. Bot might be offline.</div>';
+                console.warn("Live bot API offline. Loading demo commands offline mode.");
+                // Fallback to offline mock data
+                searchInput.placeholder = `Search demo commands... (Bot Offline)`;
+                renderCommands();
             }
         }
 
