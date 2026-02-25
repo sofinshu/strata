@@ -1441,7 +1441,7 @@
                 // Identify if this command has a special mockup
                 const isReport = cmd.name.toLowerCase().includes('report');
                 const isStats = cmd.name.toLowerCase().includes('stats');
-                const hasPreview = isReport || isStats;
+                const hasPreview = true;
 
                 let previewHTML = '';
 
@@ -1507,6 +1507,36 @@
                                                 <div style="color: #94abbd; font-size: 0.8rem; text-transform: uppercase;">Active Tickets</div>
                                                 <div style="color: #fff; font-size: 1.1rem; font-weight: bold;">4</div>
                                             </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    // Universal fallback template for all other commands
+                    let embedColor = '#94abbd'; // Default base tier color
+                    if (cmd.tier.toLowerCase() === 'premium') embedColor = '#8b5cf6';
+                    if (cmd.tier.toLowerCase() === 'enterprise') embedColor = '#f59e0b';
+
+                    previewHTML = `
+                        <div class="discord-mockup" style="width: 100%; max-width: 600px; margin: 0 auto;">
+                            <div class="discord-msg">
+                                <div class="discord-avatar"></div>
+                                <div style="width: 100%;">
+                                    <div style="color: #dbdee1; font-family: monospace; font-size: 0.9rem; margin-bottom: 5px; opacity: 0.8;">
+                                        &gt; /${cmd.name}
+                                    </div>
+                                    <div class="discord-name">STRATA <span style="background: #5865F2; font-size: 0.7rem; padding: 2px 4px; border-radius: 4px; margin-left: 5px;">BOT</span></div>
+                                    <div class="discord-embed" style="border-left-color: ${embedColor}; padding-bottom: 15px;">
+                                        <strong style="color: white; font-size: 1.1rem; display: block; margin-bottom: 8px;">Success \u2705</strong>
+                                        <div style="color: #dbdee1; line-height: 1.4;">
+                                            Executed the <strong>${cmd.name}</strong> tool successfully!<br><br>
+                                            <span style="color: #94abbd; font-style: italic;">"${cmd.desc}"</span>
+                                        </div>
+                                        <div style="margin-top: 15px; font-size: 0.75rem; color: #80848e; display: flex; align-items: center; gap: 5px;">
+                                            <div style="width: 8px; height: 8px; border-radius: 50%; background: ${embedColor};"></div>
+                                            ${cmd.tier} Tier Module • <div style="font-family: monospace; opacity: 0.8;">strata-engine-v1.4.2</div>
                                         </div>
                                     </div>
                                 </div>
