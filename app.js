@@ -4,7 +4,7 @@
 
 const CONFIG = {
     CLIENT_ID: '1473264644910088213',
-    API_BASE: 'https://your-bot-api.railway.app', // Update this to your real bot API URL
+    API_BASE: 'https://accurate-intuition-production.up.railway.app', // Update this to your real bot API URL
     get REDIRECT_URI() { return encodeURIComponent(window.location.origin + window.location.pathname); },
     get DISCORD_OAUTH_URL() { return `https://discord.com/api/oauth2/authorize?client_id=${this.CLIENT_ID}&redirect_uri=${this.REDIRECT_URI}&response_type=token&scope=identify%20guilds`; }
 };
