@@ -3,7 +3,7 @@
 // ============================================================
 
 const CONFIG = {
-    CLIENT_ID: '1381869614685356053',
+    CLIENT_ID: '1473264644910088213',
     API_BASE: 'https://your-bot-api.railway.app', // Update this to your real bot API URL
     get REDIRECT_URI() { return encodeURIComponent(window.location.origin + window.location.pathname); },
     get DISCORD_OAUTH_URL() { return `https://discord.com/api/oauth2/authorize?client_id=${this.CLIENT_ID}&redirect_uri=${this.REDIRECT_URI}&response_type=token&scope=identify%20guilds`; }
@@ -241,7 +241,7 @@ function renderGuildList(query = '') {
     }
 
     grid.innerHTML = filtered.map(g => `
-    <div class="guild-card" onclick="${g.botInstalled ? `selectGuild('${g.id}')` : `window.open('https://discord.com/api/oauth2/authorize?client_id=${CONFIG.CLIENT_ID}&permissions=8&scope=bot%20applications.commands&guild_id=${g.id}')`}">
+    <div class="guild-card" onclick="${g.botInstalled ? `selectGuild('${g.id}')` : `window.open('https://discord.com/api/oauth2/authorize?client_id=1473264644910088213&permissions=8&scope=bot%20applications.commands&guild_id=${g.id}')`}">
       ${g.icon ? `<img src="${g.icon}" class="gc-icon">` : `<div class="gc-icon-fallback">${g.name[0]}</div>`}
       <div class="gc-info">
         <div class="gc-name">${g.name}</div>
