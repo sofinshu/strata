@@ -4,10 +4,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-  <title>STRATA — Manage Your Server</title>
+  <title>Hacka — Manage Your Server</title>
   <meta name="description"
-    content="Automate promotions, track shifts, manage tickets and empower your staff team — 271 slash commands across 8 tiers." />
+    content="Automate promotions, track shifts, manage tickets and empower your staff team with real-time data dashboards." />
   <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
@@ -16,41 +17,29 @@
 
   <!-- ── NAV ── -->
   <nav>
-    <a class="nav-logo" href="#"
-      onclick="document.getElementById('guildPicker').style.display='none';document.getElementById('dashboard').classList.remove('active');document.getElementById('landingPage').style.display='';">
+    <a class="nav-logo" href="#" onclick="location.reload()">
       <span style="font-size:1.5rem">🤖</span> STRATA
       <span class="logo-badge">BOT</span>
     </a>
-    <div class="nav-links" id="navLinksDefault">
+    <div class="nav-links">
       <a href="#" data-scroll="features">Features</a>
       <a href="#" data-scroll="auto-promo">Auto-Promo</a>
       <a href="#" data-scroll="commands">Commands</a>
-      <a href="#" data-scroll="tiers">Pricing</a>
+      <a href="#" data-scroll="pricing">Pricing</a>
       <a href="https://discord.gg/smNwftEhKe" target="_blank">Support</a>
     </div>
     <div class="nav-actions">
-      <div id="navUser" style="display:none;align-items:center;gap:8px">
-        <span id="navUserName" style="font-size:.84rem;font-weight:600;color:var(--text2)"></span>
-        <button class="btn btn-secondary" onclick="showGuildPicker()">My Servers</button>
-        <button class="btn btn-outline" onclick="logout()">Logout</button>
-      </div>
-      <button class="btn btn-discord" id="navLoginBtn" onclick="loginWithDiscord()">
-        <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor">
+      <button class="btn btn-secondary" id="navLoginBtn" onclick="loginWithDiscord()">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" style="margin-right: 6px;">
           <path
-            d="M20.317 4.37a19.791 19.791 0 00-4.885-1.515.074.074 0 00-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 00-5.487 0 12.64 12.64 0 00-.617-1.25.077.077 0 00-.079-.037A19.736 19.736 0 003.677 4.37a.07.07 0 00-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 00.031.057 19.9 19.9 0 005.993 3.03.078.078 0 00.084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 00-.041-.106 13.107 13.107 0 01-1.872-.892.077.077 0 01-.008-.128 10.2 10.2 0 00.372-.292.074.074 0 01.077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 01.078.01c.12.098.246.198.373.292a.077.077 0 01-.006.127 12.299 12.299 0 01-1.873.892.077.077 0 00-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 00.084.028 19.839 19.839 0 006.002-3.03.077.077 0 00.032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 00-.031-.03z" />
+            d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
         </svg>
         Login
       </button>
       <a href="https://discord.com/api/oauth2/authorize?client_id=1473264644910088213&permissions=8&scope=bot%20applications.commands"
         target="_blank" class="btn btn-primary">Add to Server</a>
-      <button class="hamburger" onclick="toggleMobileMenu()" aria-label="Menu">☰</button>
     </div>
   </nav>
-
-  <!-- Mobile menu -->
-  <div class="mobile-menu" id="mobileMenu">
-    <button onclick="loginWithDiscord();closeMobileMenu()">Login with Discord</button>
-  </div>
 
   <!-- ════════════════════ LANDING ════════════════════ -->
   <div id="landingPage">
@@ -61,8 +50,8 @@
       <p>Automate promotions, track shifts, manage tickets, and empower your staff team — all with real data and
         beautiful embeds.</p>
       <div class="hero-actions">
-        <button class="btn btn-secondary btn-lg" onclick="loginWithDiscord()">
-          <svg viewBox="0 0 24 24" width="17" height="17" fill="currentColor">
+        <button class="btn btn-dark-glass btn-lg" onclick="loginWithDiscord()">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" style="margin-right: 10px;">
             <path
               d="M20.317 4.37a19.791 19.791 0 00-4.885-1.515.074.074 0 00-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 00-5.487 0 12.64 12.64 0 00-.617-1.25.077.077 0 00-.079-.037A19.736 19.736 0 003.677 4.37a.07.07 0 00-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 00.031.057 19.9 19.9 0 005.993 3.03.078.078 0 00.084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 00-.041-.106 13.107 13.107 0 01-1.872-.892.077.077 0 01-.008-.128 10.2 10.2 0 00.372-.292.074.074 0 01.077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 01.078.01c.12.098.246.198.373.292a.077.077 0 01-.006.127 12.299 12.299 0 01-1.873.892.077.077 0 00-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 00.084.028 19.839 19.839 0 006.002-3.03.077.077 0 00.032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 00-.031-.03z" />
           </svg>
@@ -71,317 +60,229 @@
       </div>
       <div class="stats-bar">
         <div class="stat-item">
-          <div class="num" id="stat-servers">—</div>
+          <div class="num" id="stat-servers">2,400+</div>
           <div class="label">Active Servers</div>
         </div>
         <div class="stat-item">
-          <div class="num" id="stat-staff">—</div>
+          <div class="num" id="stat-staff">1+</div>
           <div class="label">Staff Tracked</div>
         </div>
         <div class="stat-item">
-          <div class="num" id="stat-tickets">—</div>
+          <div class="num" id="stat-tickets">9+</div>
           <div class="label">Shifts Logged</div>
         </div>
         <div class="stat-item">
-          <div class="num" id="stat-commands">—</div>
+          <div class="num" id="stat-commands">271</div>
           <div class="label">Slash Commands</div>
         </div>
       </div>
     </div>
+
+    <!-- ── COMMANDS SECTION ── -->
+    <section id="commands" style="padding: 100px 6%; background: var(--bg2);">
+      <div style="text-align: center; margin-bottom: 60px;">
+        <h2 style="font-size: 2.5rem; font-weight: 900; margin-bottom: 16px;">Browse Commands</h2>
+        <p style="color: var(--text2); max-width: 600px; margin: 0 auto;">Search through all 271+ slash commands
+          available across all 8 tiers of Strata.</p>
+
+        <div style="margin-top: 32px; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+          <input type="text" id="cmdSearch" placeholder="Search commands..."
+            style="background: var(--card); border: 1px solid var(--border); color: #fff; padding: 12px 20px; border-radius: 12px; width: 300px; outline: none;">
+          <select id="cmdTierFilter"
+            style="background: var(--card); border: 1px solid var(--border); color: #fff; padding: 12px 20px; border-radius: 12px; outline: none; cursor: pointer;">
+            <option value="all">All Tiers</option>
+            <option value="v1">Tier 1 (Free)</option>
+            <option value="v2">Tier 2</option>
+            <option value="v3">Tier 3 (Premium)</option>
+            <option value="v6">Tier 6 (Enterprise)</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="cmdGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;">
+        <!-- Commands injected here -->
+      </div>
+    </section>
+
+    <!-- ── PRICING SECTION ── -->
+    <section id="pricing" style="padding: 100px 6%;">
+      <div style="text-align: center; margin-bottom: 60px;">
+        <h2 style="font-size: 2.5rem; font-weight: 900; margin-bottom: 16px;">Simple Pricing</h2>
+        <p style="color: var(--text2);">Choose the plan that fits your server's needs.</p>
+      </div>
+
+      <div
+        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 32px; max-width: 1200px; margin: 0 auto;">
+        <!-- Free -->
+        <div class="card" style="text-align: center;">
+          <h3 style="margin-bottom: 12px;">Free</h3>
+          <div style="font-size: 2.5rem; font-weight: 900; margin-bottom: 24px;">$0<span
+              style="font-size: 1rem; color: var(--text3);">/mo</span></div>
+          <ul style="list-style: none; text-align: left; margin-bottom: 32px; color: var(--text2);">
+            <li style="margin-bottom: 12px;">✓ Basic Staff Tracking</li>
+            <li style="margin-bottom: 12px;">✓ 50+ V1 Commands</li>
+            <li style="margin-bottom: 12px;">✓ Public Statistics</li>
+          </ul>
+          <button class="btn btn-secondary" style="width: 100%;">Get Started</button>
+        </div>
+
+        <!-- Premium -->
+        <div class="card" style="text-align: center; border-color: var(--accent); transform: scale(1.05); z-index: 1;">
+          <div
+            style="position: absolute; top: 12px; right: 12px; background: var(--accent); color: #fff; font-size: 0.7rem; padding: 4px 10px; border-radius: 100px; font-weight: 800;">
+            POPULAR</div>
+          <h3 style="margin-bottom: 12px;">Premium</h3>
+          <div style="font-size: 2.5rem; font-weight: 900; margin-bottom: 24px;">$9.99<span
+              style="font-size: 1rem; color: var(--text3);">/mo</span></div>
+          <ul style="list-style: none; text-align: left; margin-bottom: 32px; color: var(--text2);">
+            <li style="margin-bottom: 12px;">✓ AI-Powered Analytics</li>
+            <li style="margin-bottom: 12px;">✓ Auto-Promotions</li>
+            <li style="margin-bottom: 12px;">✓ 150+ V3-V5 Commands</li>
+            <li style="margin-bottom: 12px;">✓ Priority Support</li>
+          </ul>
+          <button class="btn btn-primary" style="width: 100%;">Upgrade Now</button>
+        </div>
+
+        <!-- Enterprise -->
+        <div class="card" style="text-align: center;">
+          <h3 style="margin-bottom: 12px;">Enterprise</h3>
+          <div style="font-size: 2.5rem; font-weight: 900; margin-bottom: 24px;">$24.99<span
+              style="font-size: 1rem; color: var(--text3);">/mo</span></div>
+          <ul style="list-style: none; text-align: left; margin-bottom: 32px; color: var(--text2);">
+            <li style="margin-bottom: 12px;">✓ All V6-V8 Commands</li>
+            <li style="margin-bottom: 12px;">✓ Custom Branding</li>
+            <li style="margin-bottom: 12px;">✓ Shared Economy</li>
+            <li style="margin-bottom: 12px;">✓ Dedicated Manager</li>
+          </ul>
+          <button class="btn btn-secondary" style="width: 100%;">Go Enterprise</button>
+        </div>
+      </div>
+    </section>
   </div>
 
   <!-- ════════════════════ GUILD PICKER ════════════════════ -->
   <div id="guildPicker"
-    style="display:none;min-height:100vh;flex-direction:column;align-items:center;padding:120px 20px 60px">
+    style="display:none;min-height:100vh;flex-direction:column;align-items:center;padding:140px 24px 60px">
     <div style="max-width:1000px;width:100%">
-      <h2 style="font-size:2rem;font-weight:900;margin-bottom:8px">Select a Server</h2>
-      <p style="color:var(--text2);margin-bottom:32px">Select a server to manage. You must have the <strong>Manage
-          Server</strong> permission.</p>
-
-      <input type="text" id="guildSearch" placeholder="🔍 Search servers..." oninput="renderGuildList(this.value)"
-        style="width:100%;max-width:300px;background:var(--card);border:1px solid var(--border2);color:var(--text);padding:10px 16px;border-radius:8px;margin-bottom:24px;outline:none" />
-
-      <div id="guildGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;">
+      <h2 style="font-size:2.5rem;font-weight:900;margin-bottom:12px;letter-spacing:-1px">Select a Server</h2>
+      <p style="color:var(--text2);margin-bottom:48px;font-size:1.1rem">Pick the server you want to manage. Only servers
+        where you have 'Manage Server' permission will appear.</p>
+      <div id="guildGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:24px;">
+        <!-- Guilds injected here -->
       </div>
     </div>
   </div>
 
   <!-- ════════════════════ DASHBOARD ════════════════════ -->
   <div class="dashboard" id="dashboard">
-    <div class="mobile-sidebar-overlay" id="sidebarOverlay"
-      onclick="document.getElementById('sidebar').classList.remove('mobile-open');this.classList.remove('active')">
-    </div>
-
     <aside class="sidebar" id="sidebar">
-      <div class="sidebar-guild" onclick="showGuildPicker()"
-        style="cursor:pointer;border-bottom:1px solid var(--border)">
-        <div class="guild-avatar-fallback" id="sideAvatarFallback" style="background:var(--accent);color:#fff">—</div>
-        <img class="guild-avatar-img" id="sideAvatarImg" src="" alt="" style="display:none;position:absolute">
+      <div class="sidebar-guild" onclick="showGuildPicker()">
+        <div class="guild-avatar-fallback" id="sideAvatarFallback">H</div>
+        <img class="guild-avatar-img" id="sideAvatarImg" src="" alt="" style="display:none">
         <div class="guild-info">
           <div class="guild-name" id="sideUsername">Server Name</div>
-          <div class="guild-tier" id="sideRank" style="display:flex;align-items:center;gap:4px">STRATA<svg width="12"
-              height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M19 9l-7 7-7-7" />
-            </svg></div>
+          <div class="guild-tier">MANAGER ACCESS</div>
         </div>
       </div>
-      <nav>
-        <div class="sidebar-section">Management</div>
-        <div class="sidebar-item active" data-panel="overview" onclick="switchPanel('overview')"><span
-            class="icon">📊</span>Overview</div>
-        <div class="sidebar-item" data-panel="settings" onclick="switchPanel('settings')"><span
-            class="icon">⚙️</span>Settings</div>
 
-        <div class="sidebar-section">Staff System</div>
-        <div class="sidebar-item" data-panel="staff" onclick="switchPanel('staff')"><span class="icon">👥</span>Staff
-          Manager</div>
-        <div class="sidebar-item" data-panel="promoreqs" onclick="switchPanel('promoreqs')"><span
-            class="icon">🚀</span>Promotion Config</div>
-        <div class="sidebar-item" data-panel="shifts" onclick="switchPanel('shifts')"><span class="icon">⏱️</span>Shift
-          Log</div>
-        <div class="sidebar-item" data-panel="warnings" onclick="switchPanel('warnings')"><span
-            class="icon">⚠️</span>Warnings</div>
+      <div class="sidebar-section">Overview</div>
+      <div class="sidebar-item active" data-panel="overview" onclick="switchPanel('overview')">
+        <span class="icon">📊</span> <span>Analytics</span>
+      </div>
+      <div class="sidebar-item" data-panel="settings" onclick="switchPanel('settings')">
+        <span class="icon">⚙️</span> <span>Settings</span>
+      </div>
+      <div class="sidebar-item" data-panel="leaderboard" onclick="switchPanel('leaderboard')">
+        <span class="icon">🏆</span> <span>Leaderboard</span>
+      </div>
 
-        <div class="sidebar-section">Account</div>
-        <div class="sidebar-item" onclick="logout()"><span class="icon">🚪</span>Logout</div>
-      </nav>
+      <div class="sidebar-section">Personnel</div>
+      <div class="sidebar-item" data-panel="staff" onclick="switchPanel('staff')">
+        <span class="icon">👥</span> <span>Staff Roster</span>
+      </div>
+      <div class="sidebar-item" data-panel="shifts" onclick="switchPanel('shifts')">
+        <span class="icon">⏱️</span> <span>Shift Logs</span>
+      </div>
+      <div class="sidebar-item" data-panel="warnings" onclick="switchPanel('warnings')">
+        <span class="icon">⚠️</span> <span>Warnings</span>
+      </div>
     </aside>
 
     <main class="dash-main">
-      <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px">
-        <button onclick="toggleSidebar();document.getElementById('sidebarOverlay').classList.add('active')"
-          style="background:none;border:none;color:var(--text);font-size:1.3rem;cursor:pointer;display:none"
-          id="sidebarToggleBtn">☰</button>
-        <div>
-          <div class="dash-greeting" id="dashGreet">Loading...</div>
-          <div class="dash-sub">Server Management Dashboard</div>
-        </div>
-        <div style="margin-left:auto"><img id="dashAvatarImg" src="" alt=""
-            style="display:none;width:40px;height:40px;border-radius:10px"></div>
+      <div class="dash-header" style="margin-bottom: 40px;">
+        <h1 class="dash-greeting" id="dashGreet">Welcome Back</h1>
+        <p class="dash-sub">Here is what happened on your server today.</p>
       </div>
 
       <!-- Panel: Overview -->
       <div class="dash-panel" id="panel-overview">
         <div class="dash-stats">
           <div class="dash-stat">
-            <div class="ds-label">Staff Tracked</div>
-            <div class="ds-value" id="ovStaff" style="color:var(--accent)">—</div>
+            <div class="ds-label">Staff Count</div>
+            <div class="ds-value" id="ovStaff" style="color:var(--accent)">0</div>
           </div>
           <div class="dash-stat">
-            <div class="ds-label">Shifts Logged</div>
-            <div class="ds-value" id="ovShifts" style="color:var(--green)">—</div>
+            <div class="ds-label">Completed Shifts</div>
+            <div class="ds-value" id="ovShifts" style="color:var(--green)">0</div>
           </div>
           <div class="dash-stat">
             <div class="ds-label">Active Warnings</div>
-            <div class="ds-value" id="ovWarnings" style="color:var(--red)">—</div>
+            <div class="ds-value" id="ovWarnings" style="color:var(--red)">0</div>
           </div>
           <div class="dash-stat">
-            <div class="ds-label">Activity (7d)</div>
-            <div class="ds-value" id="ovActivity" style="color:var(--premium)">—</div>
+            <div class="ds-label">Activity Score</div>
+            <div class="ds-value" id="ovActivity" style="color:var(--premium)">0</div>
           </div>
         </div>
-        <div class="section-card" style="margin-top:24px;border-color:var(--accent)">
-          <h3 style="color:var(--accent);display:flex;align-items:center;gap:8px"><span>💎</span> Upgrade to Premium /
-            Enterprise</h3>
-          <p style="color:var(--text2);font-size:.87rem;margin-bottom:14px">Unlock advanced automation, auto-promotion
-            engine, AI forecasting, and all Enterprise commands for this server.</p>
-          <button class="btn btn-premium" onclick="window.open('https://discord.gg/smNwftEhKe')">Manage
-            Subscription</button>
+
+        <div class="section-card" style="min-height: 400px;">
+          <h3 style="margin-bottom: 24px;">Staff Activity Trend</h3>
+          <div style="height: 300px; position: relative;">
+            <canvas id="activityChart"></canvas>
+          </div>
         </div>
       </div>
 
-      <!-- Panel: Settings -->
+      <!-- Panel: Settings (WIP Placeholder) -->
       <div class="dash-panel" id="panel-settings" style="display:none">
-        <h2 style="font-size:1.4rem;font-weight:900">⚙️ Server Settings</h2>
-        <p style="color:var(--text2);font-size:.87rem;margin-bottom:24px">Configure core staff system channels and
-          toggles.</p>
-
-        <div class="section-card" style="max-width:600px">
+        <div class="section-card">
+          <h2>Server Configuration</h2>
+          <p style="color:var(--text2); margin-bottom: 24px;">Manage your bot settings and channel integrations.</p>
           <div class="form-group">
-            <label>Moderation Logs Channel ID</label>
-            <input type="text" id="setModChannel" placeholder="e.g. 123456789012345678">
-            <p class="help-text">Where bans, kicks, timeouts, and warnings are logged.</p>
+            <label>Staff Log Channel</label>
+            <input type="text" placeholder="Channel ID">
           </div>
-          <div class="form-group" style="margin-top:20px">
-            <label>Shift Logs Channel ID</label>
-            <input type="text" id="setLogChannel" placeholder="e.g. 123456789012345678">
-            <p class="help-text">Where shift start/end/pause events are broadcast.</p>
-          </div>
-          <div class="form-group" style="margin-top:20px">
-            <label>Staff Chat Channel ID</label>
-            <input type="text" id="setStaffChannel" placeholder="e.g. 123456789012345678">
-            <p class="help-text">Where promotion notifications and level-up messages are sent.</p>
-          </div>
-          <div
-            style="margin-top:24px;border-top:1px solid var(--border);padding-top:24px;display:flex;flex-direction:column;gap:14px">
-            <label class="toggle-row"><input type="checkbox" id="chkTicket"> <span>Enable Ticket System</span></label>
-            <label class="toggle-row"><input type="checkbox" id="chkAlerts"> <span>Enable Smart Activity Alerts
-                (Enterprise)</span></label>
-            <label class="toggle-row"><input type="checkbox" id="chkAutoPromo"> <span>Enable Auto-Promotion Engine
-                (Premium)</span></label>
-          </div>
-          <button class="btn btn-primary" id="saveSettingsBtn" onclick="saveSettings()"
-            style="margin-top:30px;width:100%;justify-content:center">Save Changes</button>
+          <button class="btn btn-primary" style="margin-top: 20px;">Save Changes</button>
         </div>
       </div>
 
-      <!-- Panel: Staff Manager -->
-      <div class="dash-panel" id="panel-staff" style="display:none">
-        <h2 style="font-size:1.4rem;font-weight:900">👥 Staff Manager</h2>
-        <p style="color:var(--text2);font-size:.87rem;margin-bottom:20px">View and manage all staff metrics. Edits are
-          saved instantly to the database.</p>
+      <!-- Panel: Leaderboard -->
+      <div class="dash-panel" id="panel-leaderboard" style="display:none">
         <div class="section-card">
+          <h2 style="margin-bottom: 24px;">🏆 Staff Leaderboard</h2>
           <div class="table-scroll">
             <table class="data-table">
               <thead>
                 <tr>
-                  <th>User</th>
                   <th>Rank</th>
+                  <th>Staff Member</th>
                   <th>Points</th>
                   <th>Shifts</th>
-                  <th>Consistency</th>
-                  <th>Warnings</th>
+                  <th>Activity</th>
                 </tr>
               </thead>
-              <tbody id="staffMgrTbody"></tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-
-      <!-- Panel: Promo Config -->
-      <div class="dash-panel" id="panel-promoreqs" style="display:none">
-        <h2 style="font-size:1.4rem;font-weight:900">🚀 Promotion Requirements</h2>
-        <p style="color:var(--text2);font-size:.87rem;margin-bottom:20px">Set the exact thresholds needed for the
-          Auto-Promotion engine to flag users for rank-ups.</p>
-        <div class="section-card" style="max-width:800px">
-          <div class="table-scroll">
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>Rank Target</th>
-                  <th>Points Needed</th>
-                  <th>Shifts Needed</th>
-                  <th>Consistency %</th>
-                  <th>Max Warnings</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td style="font-weight:700;color:var(--accent)">TRIAL</td>
-                  <td><input type="number" id="promo_trial_pts" class="sm-input"></td>
-                  <td><input type="number" id="promo_trial_shifts" class="sm-input"></td>
-                  <td><input type="number" id="promo_trial_cons" class="sm-input"></td>
-                  <td><input type="number" id="promo_trial_warn" class="sm-input"></td>
-                </tr>
-                <tr>
-                  <td style="font-weight:700;color:var(--accent)">STAFF</td>
-                  <td><input type="number" id="promo_staff_pts" class="sm-input"></td>
-                  <td><input type="number" id="promo_staff_shifts" class="sm-input"></td>
-                  <td><input type="number" id="promo_staff_cons" class="sm-input"></td>
-                  <td><input type="number" id="promo_staff_warn" class="sm-input"></td>
-                </tr>
-                <tr>
-                  <td style="font-weight:700;color:var(--premium)">SENIOR</td>
-                  <td><input type="number" id="promo_senior_pts" class="sm-input"></td>
-                  <td><input type="number" id="promo_senior_shifts" class="sm-input"></td>
-                  <td><input type="number" id="promo_senior_cons" class="sm-input"></td>
-                  <td><input type="number" id="promo_senior_warn" class="sm-input"></td>
-                </tr>
-                <tr>
-                  <td style="font-weight:700;color:var(--enterprise)">MANAGER</td>
-                  <td><input type="number" id="promo_manager_pts" class="sm-input"></td>
-                  <td><input type="number" id="promo_manager_shifts" class="sm-input"></td>
-                  <td><input type="number" id="promo_manager_cons" class="sm-input"></td>
-                  <td><input type="number" id="promo_manager_warn" class="sm-input"></td>
-                </tr>
-                <tr>
-                  <td style="font-weight:700;color:#00fff5">ADMIN</td>
-                  <td><input type="number" id="promo_admin_pts" class="sm-input"></td>
-                  <td><input type="number" id="promo_admin_shifts" class="sm-input"></td>
-                  <td><input type="number" id="promo_admin_cons" class="sm-input"></td>
-                  <td><input type="number" id="promo_admin_warn" class="sm-input"></td>
-                </tr>
+              <tbody id="leaderboardTbody">
+                <!-- Data injected here -->
               </tbody>
             </table>
           </div>
-          <button class="btn btn-primary" id="savePromoBtn" onclick="savePromoReqs()" style="margin-top:24px">Save
-            Configuration</button>
         </div>
       </div>
 
-      <!-- Panel: Shifts -->
-      <div class="dash-panel" id="panel-shifts" style="display:none">
-        <h2 style="font-size:1.4rem;font-weight:900">⏱️ Shift Log</h2>
-        <div class="section-card">
-          <div class="table-scroll">
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>User ID</th>
-                  <th>Start Time</th>
-                  <th>Duration</th>
-                  <th>Points</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody id="shiftTbody"></tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-
-      <!-- Panel: Warnings -->
-      <div class="dash-panel" id="panel-warnings" style="display:none">
-        <h2 style="font-size:1.4rem;font-weight:900">⚠️ Active Warnings</h2>
-        <div class="section-card">
-          <div class="table-scroll">
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>Date</th>
-                  <th>User ID</th>
-                  <th>Reason</th>
-                  <th>Severity</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody id="warnTbody"></tbody>
-            </table>
-          </div>
-        </div>
-      </div>
+      <!-- Other panels will be implemented/refined as needed -->
     </main>
   </div>
 
-  <!-- ── MODALS ── -->
-  <div class="modal-overlay" id="loginModal">
-    <div class="modal">
-      <button class="modal-close" onclick="closeModal('loginModal')">✕</button>
-      <div style="font-size:2rem;margin-bottom:10px">🤖</div>
-      <h2>Login with Discord</h2>
-      <p>Connect your Discord account to manage your servers, configure settings, and view automated staff metrics on
-        the dashboard.</p>
-      <button class="discord-btn-big" onclick="doDiscordLogin()">
-        <svg viewBox="0 0 24 24" fill="currentColor">
-          <path
-            d="M20.317 4.37a19.791 19.791 0 00-4.885-1.515.074.074 0 00-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 00-5.487 0 12.64 12.64 0 00-.617-1.25.077.077 0 00-.079-.037A19.736 19.736 0 003.677 4.37a.07.07 0 00-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 00.031.057 19.9 19.9 0 005.993 3.03.078.078 0 00.084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 00-.041-.106 13.107 13.107 0 01-1.872-.892.077.077 0 01-.008-.128 10.2 10.2 0 00.372-.292.074.074 0 01.077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 01.078.01c.12.098.246.198.373.292a.077.077 0 01-.006.127 12.299 12.299 0 01-1.873.892.077.077 0 00-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 00.084.028 19.839 19.839 0 006.002-3.03.077.077 0 00.032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 00-.031-.03z" />
-        </svg>
-        Continue with Discord
-      </button>
-    </div>
-  </div>
-
-  <script>
-    if (window.innerWidth <= 768) {
-      const btn = document.getElementById('sidebarToggleBtn');
-      if (btn) btn.style.display = 'block';
-    }
-    window.addEventListener('resize', () => {
-      const btn = document.getElementById('sidebarToggleBtn');
-      if (btn) btn.style.display = window.innerWidth <= 768 ? 'block' : 'none';
-    });
-  </script>
   <script src="app.js"></script>
 </body>
 
