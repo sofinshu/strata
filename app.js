@@ -555,14 +555,20 @@ async function loadPromotions(guildId) {
     const list = document.getElementById('promoRankList');
     if (!list) return;
     try {
-        const reqs = await fetchAPI(`/api/dashboard/guild/${guildId}/promotion-requirements`);
+        const activeReqs = await fetchAPI(`/api/dashboard/guild/${guildId}/promotion-requirements`);
+        const reqs = activeReqs.requirements || {};
+        const rankRoles = activeReqs.rankRoles || {};
+        val('settingPromoChannel', activeReqs.promotionChannel);
+
         const ranks = ['trial', 'staff', 'senior', 'manager', 'admin'];
         const rankLabels = { trial: '🔰 Trial', staff: '⭐ Staff', senior: '🎖️ Senior', manager: '👔 Manager', admin: '👑 Admin' };
         list.innerHTML = ranks.map(r => {
             const d = reqs[r] || {};
+            const roleStr = rankRoles[r] || '';
             return `<div class="promo-rank">
                 <div class="promo-rank-name">${rankLabels[r] || r}</div>
                 <div class="promo-rank-reqs" style="gap:12px;margin-top:10px;align-items:center;flex-wrap:wrap">
+                    <div class="promo-req">Discord Role ID: <span><input type="text" id="pr-${r}-role" value="${roleStr}" placeholder="e.g. 12345" class="form-input" style="width:140px;padding:6px 10px;display:inline-block;background:rgba(255,255,255,0.05);color:#fff"></span></div>
                     <div class="promo-req">Points: <span><input type="number" id="pr-${r}-pts" value="${d.points ?? 0}" class="form-input" style="width:90px;padding:6px 10px;display:inline-block"></span></div>
                     <div class="promo-req">Shifts: <span><input type="number" id="pr-${r}-shifts" value="${d.shifts ?? 0}" class="form-input" style="width:80px;padding:6px 10px;display:inline-block"></span></div>
                     <div class="promo-req">Consistency %: <span><input type="number" id="pr-${r}-cons" value="${d.consistency ?? 0}" class="form-input" style="width:80px;padding:6px 10px;display:inline-block"></span></div>
@@ -581,14 +587,20 @@ async function savePromotions() {
     const guildId = currentGuild?.id;
     if (!guildId) return;
     const ranks = ['trial', 'staff', 'senior', 'manager', 'admin'];
-    const payload = {};
+    const payload = {
+        requirements: {},
+        rankRoles: {},
+        promotionChannel: getVal('settingPromoChannel') || null
+    };
     ranks.forEach(r => {
-        payload[r] = {
+        payload.requirements[r] = {
             points: parseInt(document.getElementById(`pr-${r}-pts`)?.value) || 0,
             shifts: parseInt(document.getElementById(`pr-${r}-shifts`)?.value) || 0,
             consistency: parseInt(document.getElementById(`pr-${r}-cons`)?.value) || 0,
             maxWarnings: parseInt(document.getElementById(`pr-${r}-warn`)?.value) ?? 3
         };
+        const role = document.getElementById(`pr-${r}-role`)?.value?.trim();
+        payload.rankRoles[r] = role || null;
     });
     try {
         const res = await fetch(`${CONFIG.API_BASE}/api/dashboard/guild/${guildId}/promotion-requirements`, {
@@ -597,7 +609,7 @@ async function savePromotions() {
             body: JSON.stringify(payload)
         });
         if (!res.ok) throw new Error();
-        toast('Promotion requirements saved ✅ — Bot will use these thresholds automatically.');
+        toast('Promotion system settings saved ✅ — Bot will use these settings natively.');
     } catch {
         toast('Failed to save promotion requirements.');
     }
