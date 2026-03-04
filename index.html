@@ -408,6 +408,9 @@
       <div class="sidebar-item" data-panel="warnings" onclick="switchPanel('warnings')">
         <span>⚠️</span> Warnings
       </div>
+      <div class="sidebar-item" data-panel="moderation" onclick="switchPanel('moderation')">
+        <span>🔨</span> Moderation
+      </div>
       <div class="sidebar-item" data-panel="leaderboard" onclick="switchPanel('leaderboard')">
         <span>🏆</span> Leaderboard
       </div>
@@ -570,6 +573,53 @@
                 </tr>
               </tbody>
             </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- MODERATION -->
+      <div class="dash-panel" id="panel-moderation" style="display:none">
+        <div class="dash-card">
+          <div class="card-title" style="display:flex;align-items:center;gap:10px">
+            🔨 Moderation Actions
+            <button class="btn btn-secondary btn-sm" onclick="loadModerationActions(currentGuild?.id)">🔄 Refresh</button>
+          </div>
+          <div class="table-filters" style="display:flex; gap:10px; margin-bottom:15px;">
+            <select id="modActionFilter" class="form-input" style="width:150px" onchange="loadModerationActions(currentGuild?.id)">
+              <option value="">All Actions</option>
+              <option value="ban">Bans</option>
+              <option value="kick">Kicks</option>
+              <option value="timeout">Timeouts</option>
+              <option value="warn">Warnings</option>
+            </select>
+          </div>
+          <div class="table-wrap">
+            <table class="data-table" id="moderationTable">
+              <thead>
+                <tr>
+                  <th>Action</th>
+                  <th>Target</th>
+                  <th>Moderator</th>
+                  <th>Reason</th>
+                  <th>Date</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="moderationBody">
+                <tr>
+                  <td colspan="6" class="table-empty">No moderation actions found.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="dash-card" style="margin-top:20px">
+          <div class="card-title">Quick Actions</div>
+          <div style="display:flex; gap:15px; flex-wrap:wrap;">
+            <button class="btn btn-danger" onclick="showModActionModal('ban')">⛔ Ban User</button>
+            <button class="btn btn-warning" onclick="showModActionModal('kick')">👢 Kick User</button>
+            <button class="btn btn-secondary" onclick="showModActionModal('warn')">⚠️ Warn User</button>
+            <button class="btn btn-info" onclick="showModActionModal('timeout')">🔇 Timeout User</button>
           </div>
         </div>
       </div>

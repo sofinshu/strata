@@ -3,9 +3,15 @@
 // All data is real, fetched from the live backend API.
 // ============================================================
 
+// Backend API Configuration
+// Set to '' to use local backend, or use production URL
+const LOCAL_API = 'http://localhost:3000';
+const PRODUCTION_API = 'https://uwu-chan-saas-production.up.railway.app';
+
 const CONFIG = {
     CLIENT_ID: '1473264644910088213',
-    API_BASE: 'https://uwu-chan-saas-production.up.railway.app',
+    // Change this to switch between local and production backend
+    API_BASE: window.location.hostname === 'localhost' ? LOCAL_API : PRODUCTION_API,
     get REDIRECT_URI() {
         return encodeURIComponent(window.location.origin + window.location.pathname);
     },
@@ -931,6 +937,7 @@ function switchPanel(panel) {
         staff: ['Staff Roster', 'All staff members and their performance.'],
         shifts: ['Shift Logs', 'Complete shift history for this server.'],
         warnings: ['Warning Log', 'All warnings issued in this server.'],
+        moderation: ['Moderation', 'Ban, kick, timeout, and moderation action history.'],
         leaderboard: ['Leaderboard', 'Top staff ranked by points and activity.'],
         ticketlogs: ['Ticket Logs', 'Operational ticket history and feedback.'],
         activitylog: ['Activity Log', 'Server-wide operational activity history.'],
@@ -970,6 +977,115 @@ function switchPanel(panel) {
     if (panel === 'promohistory') loadPromoHistory(guildId);
     if (panel === 'customcommands') loadCustomCommands(guildId);
     if (panel === 'staffrewards') loadStaffRewards(guildId);
+    if (panel === 'moderation') loadModerationActions(guildId);
+}
+
+// ══════════════════════════════════════
+// MODERATION ACTIONS
+// ══════════════════════════════════════
+
+async function loadModerationActions(guildId) {
+    const tbody = document.getElementById('moderationBody');
+    if (!tbody) return;
+
+    const actionType = document.getElementById('modActionFilter')?.value || '';
+
+    tbody.innerHTML = '<tr><td colspan="6" class="table-empty">Loading moderation actions...</td></tr>';
+
+    try {
+        let endpoint = `/api/dashboard/guild/${guildId}/moderation/actions`;
+        if (actionType) endpoint += `?type=${actionType}`;
+
+        const actions = await fetchAPI(endpoint);
+
+        if (!Array.isArray(actions) || actions.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" class="table-empty">No moderation actions found.</td></tr>';
+            return;
+        }
+
+        const actionIcons = {
+            ban: '⛔',
+            kick: '👢',
+            timeout: '🔇',
+            warn: '⚠️',
+            unban: '🔓',
+            unmute: '🔊'
+        };
+
+        const actionColors = {
+            ban: '#ff4757',
+            kick: '#ffa502',
+            timeout: '#eccc68',
+            warn: '#ffa502',
+            unban: '#2ed573',
+            unmute: '#2ed573'
+        };
+
+        tbody.innerHTML = actions.slice(0, 50).map(action => {
+            const icon = actionIcons[action.actionType] || '🔨';
+            const color = actionColors[action.actionType] || '#fff';
+            const status = action.active !== false
+                ? '<span style="color:#ff4757;font-weight:600">Active</span>'
+                : '<span style="color:#5c5c78">Expired</span>';
+
+            return `<tr>
+                <td><span style="color:${color};font-weight:600">${icon} ${action.actionType.toUpperCase()}</span></td>
+                <td>${escHtml(action.targetUsername || action.targetUserId || 'Unknown')}</td>
+                <td>${escHtml(action.moderatorUsername || action.moderatorId || 'Unknown')}</td>
+                <td style="color:#9b9bb3;max-width:200px;overflow:hidden;text-overflow:ellipsis">${escHtml(action.reason || 'No reason')}</td>
+                <td style="color:#9b9bb3;font-size:13px">${action.createdAt ? fmtDate(new Date(action.createdAt)) : '—'}</td>
+                <td>${status}</td>
+            </tr>`;
+        }).join('');
+    } catch (error) {
+        console.error('[Moderation] Load error:', error);
+        tbody.innerHTML = '<tr><td colspan="6" class="table-empty">Failed to load moderation actions.</td></tr>';
+    }
+}
+
+function showModActionModal(actionType) {
+    // Simple prompt-based action for now
+    const userId = prompt(`Enter User ID to ${actionType}:`);
+    if (!userId) return;
+
+    const reason = prompt(`Reason for ${actionType}:`);
+    if (!reason) return;
+
+    let duration = null;
+    if (actionType === 'timeout' || actionType === 'ban') {
+        const durationStr = prompt('Duration in minutes (leave empty for permanent/permanent-ish):');
+        duration = durationStr ? parseInt(durationStr) : null;
+    }
+
+    executeModAction(actionType, userId, reason, duration);
+}
+
+async function executeModAction(actionType, userId, reason, duration) {
+    const guildId = currentGuild?.id;
+    if (!guildId) return;
+
+    try {
+        const endpoint = `/api/dashboard/guild/${guildId}/moderation/${actionType}`;
+        const payload = {
+            userId,
+            reason,
+            ...(duration && { duration })
+        };
+
+        const res = await fetch(`${CONFIG.API_BASE}${endpoint}`, {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+        toast(`${actionType.charAt(0).toUpperCase() + actionType.slice(1)} executed successfully`);
+        loadModerationActions(guildId);
+    } catch (error) {
+        console.error(`[Moderation] ${actionType} error:`, error);
+        toast(`Failed to ${actionType} user. Check console for details.`);
+    }
 }
 
 // ══════════════════════════════════════
