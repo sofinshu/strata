@@ -565,19 +565,27 @@ async function loadPromotions(guildId) {
         list.innerHTML = ranks.map(r => {
             const d = reqs[r] || {};
             const roleStr = rankRoles[r] || '';
-            return `<div class="promo-rank">
-                <div class="promo-rank-name">${rankLabels[r] || r}</div>
-                <div class="promo-rank-reqs" style="gap:12px;margin-top:10px;align-items:center;flex-wrap:wrap">
-                    <div class="promo-req">Discord Role ID: <span><input type="text" id="pr-${r}-role" value="${roleStr}" placeholder="e.g. 12345" class="form-input" style="width:140px;padding:6px 10px;display:inline-block;background:rgba(255,255,255,0.05);color:#fff"></span></div>
-                    <div class="promo-req">Points: <span><input type="number" id="pr-${r}-pts" value="${d.points ?? 0}" class="form-input" style="width:90px;padding:6px 10px;display:inline-block"></span></div>
-                    <div class="promo-req">Shifts: <span><input type="number" id="pr-${r}-shifts" value="${d.shifts ?? 0}" class="form-input" style="width:80px;padding:6px 10px;display:inline-block"></span></div>
-                    <div class="promo-req">Consistency %: <span><input type="number" id="pr-${r}-cons" value="${d.consistency ?? 0}" class="form-input" style="width:80px;padding:6px 10px;display:inline-block"></span></div>
-                    <div class="promo-req">Max Warnings: <span><input type="number" id="pr-${r}-warn" value="${d.maxWarnings ?? 3}" class="form-input" style="width:75px;padding:6px 10px;display:inline-block"></span></div>
+            return `<div class="promo-rank" style="background:rgba(255,255,255,0.03);border-radius:12px;padding:20px;margin-bottom:24px;border:1px solid rgba(255,255,255,0.05)">
+                <div class="promo-rank-name" style="font-size:1.1rem;font-weight:600;margin-bottom:15px;color:var(--primary-color)">${rankLabels[r] || r}</div>
+                <div class="promo-rank-reqs" style="display:grid;grid-template-columns:repeat(auto-fill, minmax(180px, 1fr));gap:15px">
+                    <div class="promo-req">Role ID: <input type="text" id="pr-${r}-role" value="${roleStr}" placeholder="Role ID" class="form-input" style="width:100%"></div>
+                    <div class="promo-req">Points: <input type="number" id="pr-${r}-pts" value="${d.points ?? 0}" class="form-input" style="width:100%"></div>
+                    <div class="promo-req">Shifts: <input type="number" id="pr-${r}-shifts" value="${d.shifts ?? 0}" class="form-input" style="width:100%"></div>
+                    <div class="promo-req">Consistency %: <input type="number" id="pr-${r}-cons" value="${d.consistency ?? 0}" class="form-input" style="width:100%"></div>
+                    <div class="promo-req">Max Warnings: <input type="number" id="pr-${r}-warn" value="${d.maxWarnings ?? 3}" class="form-input" style="width:100%"></div>
+                    <div class="promo-req">Shift Hours: <input type="number" id="pr-${r}-hours" value="${d.shiftHours ?? 0}" class="form-input" style="width:100%"></div>
+                    <div class="promo-req">Achievements: <input type="number" id="pr-${r}-ach" value="${d.achievements ?? 0}" class="form-input" style="width:100%"></div>
+                    <div class="promo-req">Reputation: <input type="number" id="pr-${r}-rep" value="${d.reputation ?? 0}" class="form-input" style="width:100%"></div>
+                    <div class="promo-req">Days in Server: <input type="number" id="pr-${r}-days" value="${d.daysInServer ?? 0}" class="form-input" style="width:100%"></div>
+                    <div class="promo-req">Clean Record (Days): <input type="number" id="pr-${r}-clean" value="${d.cleanRecordDays ?? 0}" class="form-input" style="width:100%"></div>
+                </div>
+                <div style="margin-top:15px">
+                    <div class="promo-req">Custom Note: <input type="text" id="pr-${r}-note" value="${d.customNote ?? ''}" placeholder="Requirements note..." class="form-input" style="width:100%"></div>
                 </div>
             </div>`;
         }).join('');
         // Add save button
-        list.innerHTML += `<div style="margin-top:24px"><button class="btn btn-primary" onclick="savePromotions()">Save Promotion Requirements</button></div>`;
+        list.innerHTML += `<div style="margin-top:24px;text-align:right"><button class="btn btn-primary" style="padding:12px 30px;font-weight:600" onclick="savePromotions()">Save All Requirements</button></div>`;
     } catch {
         list.innerHTML = '<div class="table-empty">Promotion system unavailable or not configured. Use <code>/setup_promo</code> in your server first.</div>';
     }
@@ -597,7 +605,13 @@ async function savePromotions() {
             points: parseInt(document.getElementById(`pr-${r}-pts`)?.value) || 0,
             shifts: parseInt(document.getElementById(`pr-${r}-shifts`)?.value) || 0,
             consistency: parseInt(document.getElementById(`pr-${r}-cons`)?.value) || 0,
-            maxWarnings: parseInt(document.getElementById(`pr-${r}-warn`)?.value) ?? 3
+            maxWarnings: parseInt(document.getElementById(`pr-${r}-warn`)?.value) ?? 3,
+            shiftHours: parseInt(document.getElementById(`pr-${r}-hours`)?.value) || 0,
+            achievements: parseInt(document.getElementById(`pr-${r}-ach`)?.value) || 0,
+            reputation: parseInt(document.getElementById(`pr-${r}-rep`)?.value) || 0,
+            daysInServer: parseInt(document.getElementById(`pr-${r}-days`)?.value) || 0,
+            cleanRecordDays: parseInt(document.getElementById(`pr-${r}-clean`)?.value) || 0,
+            customNote: document.getElementById(`pr-${r}-note`)?.value || ''
         };
         const role = document.getElementById(`pr-${r}-role`)?.value?.trim();
         payload.rankRoles[r] = role || null;
