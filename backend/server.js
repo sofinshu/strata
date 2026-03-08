@@ -25,24 +25,7 @@ app.use(helmet({
 
 // CORS - allow dashboard to connect
 app.use(cors({
-    origin: function(origin, callback) {
-        const allowedOrigins = [
-            'http://localhost:8080', 
-            'http://localhost:3000', 
-            'https://stratadashboard-beta.vercel.app',
-            'https://strata-gamma-blond.vercel.app'
-        ];
-        if (process.env.FRONTEND_URL) allowedOrigins.push(process.env.FRONTEND_URL);
-        
-        // Allow requests with no origin (like mobile apps or curl)
-        // or if the origin is in our allowed list
-        if (!origin || allowedOrigins.includes(origin)) {
-            callback(null, true);
-        } else {
-            console.error('[CORS] Origin not allowed:', origin);
-            callback(new Error('Not allowed by CORS'));
-        }
-    },
+    origin: true, // Reflect request origin
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
