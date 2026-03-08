@@ -210,11 +210,22 @@ async function showGuildPicker() {
         const res = await fetch(`${CONFIG.API_BASE}/api/dashboard/guilds`, {
             headers: { Authorization: `Bearer ${accessToken}` }
         });
-        if (!res.ok) throw new Error();
+
+        if (!res.ok) {
+            const errData = await res.json().catch(() => ({}));
+            throw new Error(errData.error || `HTTP ${res.status}: ${res.statusText}`);
+        }
         managedGuilds = await res.json();
         renderGuildPicker();
-    } catch {
-        grid.innerHTML = '<div style="color:#ff4757;padding:40px;text-align:center">Failed to load servers. Please try again.</div>';
+    } catch (err) {
+        console.error('Guild sync error:', err);
+        grid.innerHTML = `
+            <div style="color:#ff4757;padding:40px;text-align:center">
+                <div style="font-size:18px;margin-bottom:10px">Failed to load servers</div>
+                <div style="color:#5c5c78;font-size:13px">${err.message || 'Please try again.'}</div>
+                <button class="btn btn-ghost btn-sm" style="margin-top:15px" onclick="showGuildPicker()">Retry</button>
+            </div>
+        `;
     }
 }
 

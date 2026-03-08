@@ -161,6 +161,7 @@ async function verifyDiscordToken(req, res, next) {
     const token = authHeader && authHeader.split(' ')[1];
 
     if (!token) {
+        console.warn('[Auth] Missing Discord access token in request');
         return res.status(401).json({ error: 'Discord access token required' });
     }
 
@@ -174,8 +175,14 @@ async function verifyDiscordToken(req, res, next) {
         req.discordToken = token;
         next();
     } catch (error) {
-        console.error('[Auth] Discord token verification failed:', error.message);
-        res.status(401).json({ error: 'Invalid Discord token' });
+        const status = error.response?.status || 500;
+        const data = error.response?.data;
+        console.error(`[Auth] Discord token verification failed (Status: ${status}):`, data || error.message);
+        
+        res.status(status).json({ 
+            error: 'Invalid or expired Discord token',
+            details: data?.message || 'Verification failed' 
+        });
     }
 }
 
