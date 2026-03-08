@@ -29,7 +29,8 @@ app.use(cors({
         const allowedOrigins = [
             'http://localhost:8080', 
             'http://localhost:3000', 
-            'https://stratadashboard-beta.vercel.app'
+            'https://stratadashboard-beta.vercel.app',
+            'https://strata-gamma-blond.vercel.app'
         ];
         if (process.env.FRONTEND_URL) allowedOrigins.push(process.env.FRONTEND_URL);
         
