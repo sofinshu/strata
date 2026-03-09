@@ -1,4 +1,4 @@
-require('dotenv').config();
+﻿require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -20,7 +20,8 @@ const NODE_ENV = process.env.NODE_ENV || 'development';
 // Security middleware
 app.use(helmet({
     contentSecurityPolicy: false, // Allow inline scripts for now
-    crossOriginEmbedderPolicy: false
+    crossOriginEmbedderPolicy: false,
+    crossOriginResourcePolicy: false
 }));
 
 // CORS - manual implementation for maximum compatibility
