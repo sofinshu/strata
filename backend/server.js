@@ -15,24 +15,26 @@ const moderationRoutes = require('./routes/moderation');
 const systemRoutes = require('./routes/systems');
 
 const app = express();
+app.set("trust proxy", 1);
+
 const PORT = process.env.PORT || 3000;
 const NODE_ENV = process.env.NODE_ENV || 'development';
 
 // Security middleware
 app.use(helmet({
-    contentSecurityPolicy: false, // Allow inline scripts for now
+    contentSecurityPolicy: false,
     crossOriginEmbedderPolicy: false,
     crossOriginResourcePolicy: false
 }));
 
-// CORS - manual implementation for maximum compatibility
+// CORS - manual implementation
 app.use((req, res, next) => {
     const origin = req.headers.origin;
     res.setHeader('Access-Control-Allow-Origin', origin || '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     res.setHeader('Access-Control-Allow-Credentials', 'true');
-    
+
     if (req.method === 'OPTIONS') {
         return res.sendStatus(200);
     }
@@ -41,8 +43,8 @@ app.use((req, res, next) => {
 
 // Rate limiting
 const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100, // limit each IP to 100 requests per windowMs
+    windowMs: 15 * 60 * 1000,
+    max: 100,
     message: { error: 'Too many requests, please try again later.' }
 });
 app.use('/api/', limiter);
@@ -56,8 +58,8 @@ app.use(morgan(NODE_ENV === 'production' ? 'combined' : 'dev'));
 
 // Health check
 app.get('/health', (req, res) => {
-    res.json({ 
-        status: 'ok', 
+    res.json({
+        status: 'ok',
         timestamp: new Date().toISOString(),
         version: '1.0.0'
     });
@@ -73,7 +75,7 @@ app.use('/api/dashboard/guild/:guildId', systemRoutes);
 // Serve static files (frontend) in production
 if (NODE_ENV === 'production') {
     app.use(express.static(path.join(__dirname, '..', 'frontend')));
-    
+
     app.get('*', (req, res) => {
         res.sendFile(path.join(__dirname, '..', 'frontend', 'index.html'));
     });
@@ -114,4 +116,3 @@ app.listen(PORT, () => {
 });
 
 module.exports = app;
-
