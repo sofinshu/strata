@@ -1,0 +1,12 @@
+{
+    "name": "strata",
+    "version": "1.0.0",
+    "description": "STRATA Discord Bot Dashboard",
+    "scripts": {
+        "start": "cd backend && node server.js",
+        "build": "cd backend && npm install"
+    },
+    "engines": {
+        "node": ">=18.0.0"
+    }
+}
