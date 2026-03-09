@@ -7,6 +7,7 @@ const rateLimit = require('express-rate-limit');
 const path = require('path');
 
 const db = require('./database/connection');
+require('./bot');
 const authRoutes = require('./routes/auth');
 const dashboardRoutes = require('./routes/dashboard');
 const guildRoutes = require('./routes/guild');
@@ -113,3 +114,4 @@ app.listen(PORT, () => {
 });
 
 module.exports = app;
+
