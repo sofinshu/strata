@@ -33,4 +33,5 @@ if (token) {
     console.warn('[Bot] DISCORD_TOKEN not set - bot will not connect to Discord');
 }
 
-module.exports = client;
+// Export client for use in other modules
+module.exports = { client };
