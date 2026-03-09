@@ -258,7 +258,7 @@ async function selectGuild(id) {
     if (!currentGuild) return;
 
     if (!currentGuild.botInstalled) {
-        const authUrl = `https://discord.com/api/oauth2/authorize?client_id=${CONFIG.CLIENT_ID}&permissions=8&scope=bot%20applications.commands&guild_id=${id}`;
+        const authUrl = `https://discord.com/oauth2/authorize?client_id=1473264644910088213&permissions=8&integration_type=0&scope=bot+applications.commands&guild_id=${id}`;
         window.open(authUrl, '_blank');
         toast('Please add the bot, then return here and refresh.', 4000);
         return;
@@ -2099,3 +2099,4 @@ function fmtDuration(minutes) {
     const m = Math.round(minutes % 60);
     return h > 0 ? `${h}h ${m}m` : `${m}m`;
 }
+
