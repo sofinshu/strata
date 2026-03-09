@@ -1,0 +1,1 @@
+[build]`nbuildCommand = "npm install"`n`n[deploy]`nstartCommand = "node server.js"`nhealthcheckPath = "/health"`nhealthcheckTimeout = 30`nrestartPolicyType = "on_failure"
