@@ -266,15 +266,39 @@ async function showGuildPicker() {
     grid.innerHTML = '<div style="color:#5c5c78;padding:40px;text-align:center">Loading your servers...</div>';
 
     try {
-        const res = await fetch(`${CONFIG.API_BASE}/api/dashboard/guilds`, {
-            headers: { Authorization: `Bearer ${accessToken}` }
-        });
+        // Call Strata backend (SQLite) and real bot (MongoDB) in parallel
+        const [strataRes, botGuildsRaw] = await Promise.allSettled([
+            fetch(`${CONFIG.API_BASE}/api/dashboard/guilds`, {
+                headers: { Authorization: `Bearer ${accessToken}` }
+            }).then(r => r.ok ? r.json() : Promise.reject(r.statusText)),
+            fetchBotAPI('/api/dashboard/guilds')
+        ]);
 
-        if (!res.ok) {
-            const errData = await res.json().catch(() => ({}));
-            throw new Error(errData.error || `HTTP ${res.status}: ${res.statusText}`);
+        if (strataRes.status === 'rejected') {
+            throw new Error(strataRes.reason || 'Failed to fetch servers');
         }
-        managedGuilds = await res.json();
+
+        const strataGuilds = Array.isArray(strataRes.value) ? strataRes.value : [];
+
+        // Build a lookup of guildId -> botInstalled from the real bot's MongoDB
+        const botInstalledIds = new Set();
+        const botTierMap = {};
+        if (Array.isArray(botGuildsRaw.value)) {
+            for (const g of botGuildsRaw.value) {
+                if (g.botInstalled) {
+                    botInstalledIds.add(g.id);
+                    botTierMap[g.id] = g.tier;
+                }
+            }
+        }
+
+        // Merge: guild is installed if Strata OR real bot says so
+        managedGuilds = strataGuilds.map(g => ({
+            ...g,
+            botInstalled: g.botInstalled || botInstalledIds.has(g.id),
+            tier: g.tier || botTierMap[g.id] || 'free'
+        }));
+
         renderGuildPicker();
     } catch (err) {
         console.error('Guild sync error:', err);
