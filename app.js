@@ -6,7 +6,7 @@
 // Backend API Configuration
 // Set to '' to use local backend, or use production URL
 const LOCAL_API = 'http://localhost:3000';
-const PRODUCTION_API = 'https://uwu-chan-saas-production.up.railway.app';
+const PRODUCTION_API = 'https://strata-production-6d40.up.railway.app';
 
 const CONFIG = {
     CLIENT_ID: '1473264644910088213',

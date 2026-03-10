@@ -49,19 +49,46 @@ router.get('/guilds', verifyDiscordToken, async (req, res) => {
             return g.owner || (permissions & BigInt(0x20));
         });
 
-        // Check which guilds have bot installed and get their tier
-        const guildsWithData = managedGuilds.map(g => {
+        // Check which guilds have the bot installed.
+        // First checks local SQLite (fast). If not found, confirms via Discord bot API.
+        const BOT_TOKEN = process.env.DISCORD_TOKEN;
+
+        const guildsWithData = await Promise.all(managedGuilds.map(async g => {
+            let botInstalled = false;
+            let tier = 'free';
+
+            // Fast check: is this guild already in the local DB?
             const dbGuild = db.prepare('SELECT tier FROM guilds WHERE id = ?').get(g.id);
+            if (dbGuild) {
+                botInstalled = true;
+                tier = dbGuild.tier || 'free';
+            } else if (BOT_TOKEN) {
+                // Slow check: ask Discord if our bot is in this guild
+                try {
+                    await axios.get(`${DISCORD_API}/guilds/${g.id}`, {
+                        headers: { Authorization: `Bot ${BOT_TOKEN}` }
+                    });
+                    botInstalled = true;
+                    // Cache guild in DB for future fast lookups
+                    try {
+                        db.prepare('INSERT OR IGNORE INTO guilds (id, name, tier) VALUES (?, ?, ?)').run(g.id, g.name, 'free');
+                    } catch (_) {}
+                } catch (_e) {
+                    // 403/404 means bot is not in this guild
+                    botInstalled = false;
+                }
+            }
+
             return {
                 id: g.id,
                 name: g.name,
                 icon: g.icon,
                 owner: g.owner,
                 permissions: g.permissions,
-                botInstalled: !!dbGuild,
-                tier: dbGuild?.tier || 'free'
+                botInstalled,
+                tier
             };
-        });
+        }));
 
         res.json(guildsWithData);
     } catch (error) {
