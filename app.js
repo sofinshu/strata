@@ -8,6 +8,10 @@
 const LOCAL_API = 'http://localhost:3000';
 const PRODUCTION_API = 'https://strata-production-6d40.up.railway.app';
 
+// Real bot API (MongoDB) — used to enrich dashboard with live data
+// Falls back to PRODUCTION_API if unavailable
+const REAL_BOT_API = 'https://sofinshu-production.up.railway.app';
+
 const CONFIG = {
     CLIENT_ID: '1473264644910088213',
     // Change this to switch between local and production backend
@@ -19,6 +23,19 @@ const CONFIG = {
         return `https://discord.com/api/oauth2/authorize?client_id=${this.CLIENT_ID}&redirect_uri=${this.REDIRECT_URI}&response_type=token&scope=identify%20guilds`;
     }
 };
+
+// ── REAL BOT API HELPER ──
+// Tries to fetch from the real MongoDB-backed bot first.
+// Falls back silently to the Strata backend if unavailable.
+async function fetchBotAPI(path, options = {}) {
+    const headers = { Authorization: `Bearer ${accessToken}`, ...(options.headers || {}) };
+    try {
+        const res = await fetch(`${REAL_BOT_API}${path}`, { ...options, headers });
+        if (res.ok) return await res.json();
+    } catch (_) {}
+    return null; // null = caller should fall back to Strata API
+}
+
 
 // ── STATE ──
 let accessToken = null;
@@ -331,17 +348,31 @@ async function loadDashboardData() {
     if (!guildId) return;
 
     try {
-        const [overviewRes, staffRes, shiftsRes, warningsRes] = await Promise.allSettled([
+        // Fetch from BOTH the real bot API (MongoDB) and Strata SQLite API in parallel
+        const [
+            botOverview, botStaff, botShifts, botWarnings,
+            strataOverview, strataStaff, strataShifts, strataWarnings
+        ] = await Promise.allSettled([
+            // Real bot (MongoDB) — preferred source
+            fetchBotAPI(`/api/dashboard/guild/${guildId}`),
+            fetchBotAPI(`/api/dashboard/guild/${guildId}/staff`),
+            fetchBotAPI(`/api/dashboard/guild/${guildId}/shifts`),
+            fetchBotAPI(`/api/dashboard/guild/${guildId}/warnings`),
+            // Strata backend (SQLite) — fallback
             fetchAPI(`/api/dashboard/guild/${guildId}`),
             fetchAPI(`/api/dashboard/guild/${guildId}/staff`),
             fetchAPI(`/api/dashboard/guild/${guildId}/shifts`),
             fetchAPI(`/api/dashboard/guild/${guildId}/warnings`)
         ]);
 
-        const overview = overviewRes.status === 'fulfilled' ? overviewRes.value : null;
-        const staff = staffRes.status === 'fulfilled' ? staffRes.value : [];
-        const shifts = shiftsRes.status === 'fulfilled' ? shiftsRes.value : [];
-        const warnings = warningsRes.status === 'fulfilled' ? warningsRes.value : [];
+        // Prefer real bot data; fall back to Strata if real bot returned null/failed
+        const overview = (botOverview.value) || (strataOverview.status === 'fulfilled' ? strataOverview.value : null);
+        const staff    = (Array.isArray(botStaff.value) && botStaff.value.length ? botStaff.value : null)
+                      || (strataStaff.status === 'fulfilled' && Array.isArray(strataStaff.value) ? strataStaff.value : []);
+        const shifts   = (Array.isArray(botShifts.value) && botShifts.value.length ? botShifts.value : null)
+                      || (strataShifts.status === 'fulfilled' && Array.isArray(strataShifts.value) ? strataShifts.value : []);
+        const warnings = (Array.isArray(botWarnings.value) && botWarnings.value.length ? botWarnings.value : null)
+                      || (strataWarnings.status === 'fulfilled' && Array.isArray(strataWarnings.value) ? strataWarnings.value : []);
 
         renderOverview(overview, staff, shifts, warnings);
         renderStaff(staff);
@@ -356,6 +387,7 @@ async function loadDashboardData() {
         toast('Error loading data');
     }
 }
+
 
 function renderOverview(overview, staff, shifts, warnings) {
     const s = overview?.stats || overview || {};
@@ -585,7 +617,11 @@ async function loadLeaderboard(guildId) {
     const tbody = document.getElementById('leaderboardBody');
     if (!tbody) return;
     try {
-        const data = await fetchAPI(`/api/dashboard/guild/${guildId}/leaderboard`);
+        // Try real bot (MongoDB points), fall back to Strata SQLite
+        let data = await fetchBotAPI(`/api/dashboard/guild/${guildId}/leaderboard`);
+        if (!Array.isArray(data) || !data.length) {
+            data = await fetchAPI(`/api/dashboard/guild/${guildId}/leaderboard`);
+        }
         if (!Array.isArray(data) || !data.length) {
             tbody.innerHTML = '<tr><td colspan="5" class="table-empty">No leaderboard data yet.</td></tr>';
             return;
@@ -620,7 +656,11 @@ async function loadTicketLogs(guildId) {
 
     tbody.innerHTML = '<tr><td colspan="6" class="table-empty">Loading tickets...</td></tr>';
     try {
-        const data = await fetchAPI(`/api/dashboard/guild/${guildId}/ticket-logs?type=${type}&status=${status}`);
+        // Try real bot (MongoDB), fall back to Strata SQLite
+        let data = await fetchBotAPI(`/api/dashboard/guild/${guildId}/ticket-logs?type=${type}&status=${status}`);
+        if (!Array.isArray(data) || !data.length) {
+            data = await fetchAPI(`/api/dashboard/guild/${guildId}/ticket-logs?type=${type}&status=${status}`);
+        }
         if (!Array.isArray(data) || !data.length) {
             tbody.innerHTML = '<tr><td colspan="6" class="table-empty">No tickets found.</td></tr>';
             return;
@@ -657,7 +697,11 @@ async function loadActivityLog(guildId) {
     if (!tbody) return;
     tbody.innerHTML = '<tr><td colspan="4" class="table-empty">Loading activity...</td></tr>';
     try {
-        const data = await fetchAPI(`/api/dashboard/guild/${guildId}/activity-logs`);
+        // Try real bot (MongoDB), fall back to Strata SQLite
+        let data = await fetchBotAPI(`/api/dashboard/guild/${guildId}/activity-logs`);
+        if (!Array.isArray(data) || !data.length) {
+            data = await fetchAPI(`/api/dashboard/guild/${guildId}/activity-logs`);
+        }
         if (!Array.isArray(data) || !data.length) {
             tbody.innerHTML = '<tr><td colspan="4" class="table-empty">No activity found.</td></tr>';
             return;
