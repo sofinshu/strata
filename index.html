@@ -34,9 +34,16 @@
       <a href="https://discord.gg/smNwftEhKe" target="_blank">Support</a>
     </div>
     <div class="nav-actions">
+      <!-- Shown when NOT logged in -->
       <button class="btn btn-ghost" id="navLoginBtn" onclick="loginWithDiscord()">
         Login
       </button>
+      <!-- Shown when logged in -->
+      <div id="navUserArea" style="display:none;align-items:center;gap:10px">
+        <img id="navUserAvatar" src="" alt="" style="width:32px;height:32px;border-radius:50%;border:2px solid rgba(108,99,255,0.5);object-fit:cover" onerror="this.style.display='none'">
+        <span id="navUsername" style="font-size:13px;font-weight:600;color:#e0e0f0"></span>
+        <button class="btn btn-ghost btn-sm" onclick="logout()" style="color:#ff4757;font-size:12px">Logout</button>
+      </div>
       <a href="https://discord.com/api/oauth2/authorize?client_id=1473264644910088213&permissions=8&scope=bot%20applications.commands"
         target="_blank" class="btn btn-primary">
         Add to Server

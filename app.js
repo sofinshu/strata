@@ -187,6 +187,7 @@ async function handleOAuthCallback() {
         });
         if (!res.ok) throw new Error('User fetch failed');
         currentUser = await res.json();
+        updateNavUser();
         toast(`Welcome back, ${currentUser.username}! 👋`);
         await showGuildPicker();
         return true;
@@ -196,6 +197,47 @@ async function handleOAuthCallback() {
         return false;
     }
 }
+
+function updateNavUser() {
+    const loginBtn = document.getElementById('navLoginBtn');
+    const userArea = document.getElementById('navUserArea');
+    const avatarEl = document.getElementById('navUserAvatar');
+    const usernameEl = document.getElementById('navUsername');
+
+    if (!currentUser) {
+        if (loginBtn) loginBtn.style.display = '';
+        if (userArea) userArea.style.display = 'none';
+        return;
+    }
+
+    // Hide Login button, show user area
+    if (loginBtn) loginBtn.style.display = 'none';
+    if (userArea) userArea.style.display = 'flex';
+
+    // Set avatar
+    if (avatarEl) {
+        if (currentUser.avatar) {
+            avatarEl.src = `https://cdn.discordapp.com/avatars/${currentUser.id}/${currentUser.avatar}.png?size=64`;
+            avatarEl.style.display = 'block';
+        } else {
+            // Default Discord avatar
+            avatarEl.src = `https://cdn.discordapp.com/embed/avatars/${Number(currentUser.id) % 5}.png`;
+            avatarEl.style.display = 'block';
+        }
+    }
+    if (usernameEl) usernameEl.textContent = currentUser.username || '';
+}
+
+function logout() {
+    accessToken = null;
+    currentUser = null;
+    managedGuilds = [];
+    currentGuild = null;
+    updateNavUser();
+    toast('Logged out successfully.');
+    setTimeout(() => { window.location.href = window.location.pathname; }, 800);
+}
+
 
 // ══════════════════════════════════════
 // GUILD PICKER
