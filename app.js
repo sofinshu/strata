@@ -65,17 +65,28 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 async function loadPublicStats() {
     try {
-        const res = await fetch(`${CONFIG.API_BASE}/api/dashboard/stats`);
-        if (!res.ok) throw new Error();
-        const d = await res.json();
+        // Try fetching real bot stats from MongoDB first
+        let d = null;
+        try {
+            const res = await fetch(`${REAL_BOT_API}/api/dashboard/stats`);
+            if (res.ok) d = await res.json();
+        } catch (_) {}
+
+        // Fallback to Strata API if real bot fails or returns empty
+        if (!d) {
+            const res = await fetch(`${CONFIG.API_BASE}/api/dashboard/stats`);
+            if (res.ok) d = await res.json();
+        }
+
+        if (!d) throw new Error();
 
         // Real numbers from live API
-        setStatText('stat-servers', '2,400+');          // Public server count (hardcoded baseline)
+        animateStat('stat-servers', d.serverCount ?? 2);
         animateStat('stat-staff', d.staffCount ?? 1);
         animateStat('stat-shifts', d.totalShifts ?? 9);
         setStatText('stat-commands', String(d.commandCount ?? 271));
     } catch {
-        setStatText('stat-servers', '2,400+');
+        setStatText('stat-servers', '2');
         setStatText('stat-staff', '1');
         setStatText('stat-shifts', '9');
         setStatText('stat-commands', '271');
@@ -266,37 +277,36 @@ async function showGuildPicker() {
     grid.innerHTML = '<div style="color:#5c5c78;padding:40px;text-align:center">Loading your servers...</div>';
 
     try {
-        // Call Strata backend (SQLite) and real bot (MongoDB) in parallel
-        const [strataRes, botGuildsRaw] = await Promise.allSettled([
-            fetch(`${CONFIG.API_BASE}/api/dashboard/guilds`, {
-                headers: { Authorization: `Bearer ${accessToken}` }
-            }).then(r => r.ok ? r.json() : Promise.reject(r.statusText)),
-            fetchBotAPI('/api/dashboard/guilds')
-        ]);
-
-        if (strataRes.status === 'rejected') {
-            throw new Error(strataRes.reason || 'Failed to fetch servers');
+        // Step 1: Get list of user's managed guilds from Strata backend
+        // Only ONE Discord API call happens here (inside the Strata backend)
+        const strataRes = await fetch(`${CONFIG.API_BASE}/api/dashboard/guilds`, {
+            headers: { Authorization: `Bearer ${accessToken}` }
+        });
+        if (!strataRes.ok) {
+            const errData = await strataRes.json().catch(() => ({}));
+            throw new Error(errData.error || `HTTP ${strataRes.status}: ${strataRes.statusText}`);
         }
+        const strataGuilds = await strataRes.json();
 
-        const strataGuilds = Array.isArray(strataRes.value) ? strataRes.value : [];
+        // Step 2: Ask real bot which of those guild IDs are in MongoDB
+        // This does NOT call Discord — only queries MongoDB. Avoids 429 rate limits.
+        const guildIds = strataGuilds.map(g => g.id).join(',');
+        const botRes = await fetchBotAPI(`/api/dashboard/bot-guilds?ids=${guildIds}`);
 
-        // Build a lookup of guildId -> botInstalled from the real bot's MongoDB
         const botInstalledIds = new Set();
         const botTierMap = {};
-        if (Array.isArray(botGuildsRaw.value)) {
-            for (const g of botGuildsRaw.value) {
-                if (g.botInstalled) {
-                    botInstalledIds.add(g.id);
-                    botTierMap[g.id] = g.tier;
-                }
+        if (botRes?.installedIds && Array.isArray(botRes.installedIds)) {
+            for (const entry of botRes.installedIds) {
+                botInstalledIds.add(entry.id);
+                botTierMap[entry.id] = entry.tier;
             }
         }
 
-        // Merge: guild is installed if Strata OR real bot says so
+        // Merge: installed if Strata SQLite OR real bot MongoDB says so
         managedGuilds = strataGuilds.map(g => ({
             ...g,
             botInstalled: g.botInstalled || botInstalledIds.has(g.id),
-            tier: g.tier || botTierMap[g.id] || 'free'
+            tier: g.tier !== 'free' ? g.tier : (botTierMap[g.id] || 'free')
         }));
 
         renderGuildPicker();
