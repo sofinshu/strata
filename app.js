@@ -2029,7 +2029,14 @@ async function loadCustomCommands(guildId) {
     if (!list) return;
 
     try {
-        const data = await fetchAPI(`/api/dashboard/guild/${guildId}/custom-commands`);
+        // Try real bot (MongoDB) first, fall back to Strata API
+        let data = await fetchBotAPI(`/api/dashboard/guild/${guildId}/custom-commands`);
+        // Bot API returns { commands: [] }, Strata API returns [] directly
+        if (data && data.commands) data = data.commands;
+        if (!Array.isArray(data)) {
+            const strataData = await fetchAPI(`/api/dashboard/guild/${guildId}/custom-commands`);
+            data = Array.isArray(strataData) ? strataData : (strataData?.commands || []);
+        }
         cachedCustomCommands = data;
 
         list.innerHTML = data.length ? data.map(cmd => `
@@ -2038,20 +2045,20 @@ async function loadCustomCommands(guildId) {
                     <div style="flex:1">
                         <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
                             <span style="font-family:monospace;font-weight:700;color:var(--primary-color);font-size:1.1rem">${escHtml(cmd.trigger)}</span>
-                            <span class="badge" style="background:rgba(255,255,255,0.05);color:#9b9bb3;font-size:10px">${cmd.match_type.toUpperCase()}</span>
-                            ${cmd.is_embed ? '<span class="badge" style="background:#6c63ff20;color:#6c63ff;font-size:10px">EMBED</span>' : ''}
+                            <span class="badge" style="background:rgba(255,255,255,0.05);color:#9b9bb3;font-size:10px">${(cmd.match_type || cmd.matchType || 'exact').toUpperCase()}</span>
+                            ${(cmd.is_embed || cmd.isEmbed) ? '<span class="badge" style="background:#6c63ff20;color:#6c63ff;font-size:10px">EMBED</span>' : ''}
                         </div>
                         <div style="font-size:13px;color:#9b9bb3;line-height:1.5;max-width:500px">
                             ${escHtml(cmd.response)}
                         </div>
                         <div style="font-size:11px;color:#5c5c78;margin-top:8px">
-                            Used ${cmd.usage_count} times • Match: ${cmd.match_type}
+                            Used ${cmd.usage_count || cmd.usageCount || 0} times • Match: ${cmd.match_type || cmd.matchType || 'exact'}
                         </div>
                     </div>
                     <div style="display:flex;gap:10px;align-items:center">
-                        <label class="toggle"><input type="checkbox" ${cmd.enabled ? 'checked' : ''} onchange="toggleCmd(${cmd.id}, this.checked)"><span class="toggle-slider"></span></label>
-                        <button class="btn btn-secondary btn-sm" onclick="showCustomCommandModal(${cmd.id})">Edit</button>
-                        <button class="btn btn-secondary btn-sm" style="color:#ff4b4b" onclick="deleteCustomCommand(${cmd.id})">Delete</button>
+                        <label class="toggle"><input type="checkbox" ${(cmd.enabled !== false) ? 'checked' : ''} onchange="toggleCmd('${cmd._id || cmd.id}', this.checked)"><span class="toggle-slider"></span></label>
+                        <button class="btn btn-secondary btn-sm" onclick="showCustomCommandModal('${cmd._id || cmd.id}')">Edit</button>
+                        <button class="btn btn-secondary btn-sm" style="color:#ff4b4b" onclick="deleteCustomCommand('${cmd._id || cmd.id}')">Delete</button>
                     </div>
                 </div>
             </div>
@@ -2074,15 +2081,15 @@ function showCustomCommandModal(id = null) {
     if (!modal) return;
 
     if (id) {
-        const cmd = cachedCustomCommands.find(c => c.id === id);
+        const cmd = cachedCustomCommands.find(c => (c._id || c.id) === id || (c._id || c.id) == id);
         if (!cmd) return;
         title.innerText = 'Edit Custom Command';
-        cmdId.value = cmd.id;
+        cmdId.value = cmd._id || cmd.id;
         trigger.value = cmd.trigger;
         response.value = cmd.response;
-        matchType.value = cmd.match_type;
-        isEmbed.checked = !!cmd.is_embed;
-        enabled.checked = !!cmd.enabled;
+        matchType.value = cmd.match_type || cmd.matchType || 'exact';
+        isEmbed.checked = !!(cmd.is_embed || cmd.isEmbed);
+        enabled.checked = cmd.enabled !== false;
     } else {
         title.innerText = 'Create Custom Command';
         cmdId.value = '';
@@ -2104,8 +2111,8 @@ function closeCustomCommandModal() {
 async function submitCustomCommand() {
     const guildId = currentGuild.id;
     const id = document.getElementById('cmdId').value;
-    const trigger = document.getElementById('cmdTrigger').value;
-    const response = document.getElementById('cmdResponse').value;
+    const trigger = document.getElementById('cmdTrigger').value.trim();
+    const response = document.getElementById('cmdResponse').value.trim();
     const matchType = document.getElementById('cmdMatchType').value;
     const isEmbed = document.getElementById('cmdIsEmbed').checked;
     const enabled = document.getElementById('cmdEnabled').checked;
@@ -2113,17 +2120,22 @@ async function submitCustomCommand() {
     if (!trigger || !response) return alert('Trigger and Response are required');
 
     try {
-        await fetchAPI(`/api/dashboard/guild/${guildId}/custom-commands`, {
-            method: 'POST',
+        // Build updated commands array for PATCH
+        let updatedCommands = [...cachedCustomCommands];
+        if (id) {
+            // Edit existing
+            updatedCommands = updatedCommands.map(c =>
+                (c._id || c.id) == id ? { ...c, trigger, response, matchType, isEmbed, enabled } : c
+            );
+        } else {
+            // Add new
+            updatedCommands.push({ trigger, response, matchType, isEmbed, enabled });
+        }
+
+        await fetchBotAPI(`/api/dashboard/guild/${guildId}/custom-commands`, {
+            method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                id: id || undefined,
-                trigger,
-                response,
-                matchType,
-                isEmbed,
-                enabled
-            })
+            body: JSON.stringify({ commands: updatedCommands })
         });
 
         toast('Custom command saved ✅');
