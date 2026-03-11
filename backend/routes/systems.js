@@ -1,4 +1,5 @@
 const express = require('express');
+const axios = require('axios');
 const db = require('../database/connection');
 const { verifyDiscordToken } = require('./auth');
 
@@ -39,7 +40,7 @@ router.get('/systems/:system', verifyDiscordToken, (req, res) => {
 });
 
 // Update system configuration
-router.patch('/systems/:system', verifyDiscordToken, (req, res) => {
+router.patch('/systems/:system', verifyDiscordToken, async (req, res) => {
     try {
         const { guildId, system } = req.params;
         const data = req.body;
@@ -66,6 +67,19 @@ router.patch('/systems/:system', verifyDiscordToken, (req, res) => {
         `);
 
         stmt.run(guildId, system, JSON.stringify(config), enabled ? 1 : 0);
+
+        // Forward to Discord Bot API to sync MongoDB and clear cache
+        const BOT_API = process.env.REAL_BOT_API || 'https://sofinshu-production.up.railway.app';
+        try {
+            await axios.patch(`${BOT_API}/api/dashboard/guild/${guildId}/systems/${system}`, data, {
+                headers: {
+                    'Authorization': req.headers.authorization,
+                    'Content-Type': 'application/json'
+                }
+            });
+        } catch (botErr) {
+            console.error(`[Systems] Failed to sync ${system} config to Bot API:`, botErr.message);
+        }
 
         // Log activity
         logActivity(guildId, req.discordUser?.id, `${system}_updated`, { enabled });

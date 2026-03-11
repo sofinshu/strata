@@ -2080,7 +2080,7 @@ function showCustomCommandModal(id = null) {
 
     if (!modal) return;
 
-    if (id) {
+    if (id && typeof id === 'string') {
         const cmd = cachedCustomCommands.find(c => (c._id || c.id) === id || (c._id || c.id) == id);
         if (!cmd) return;
         title.innerText = 'Edit Custom Command';
@@ -2117,32 +2117,23 @@ async function submitCustomCommand() {
     const isEmbed = document.getElementById('cmdIsEmbed').checked;
     const enabled = document.getElementById('cmdEnabled').checked;
 
-    if (!trigger || !response) return alert('Trigger and Response are required');
+    if (!trigger || !response) return showToast('Trigger and Response are required', 'error');
 
     try {
-        // Build updated commands array for PATCH
-        let updatedCommands = [...cachedCustomCommands];
-        if (id) {
-            // Edit existing
-            updatedCommands = updatedCommands.map(c =>
-                (c._id || c.id) == id ? { ...c, trigger, response, matchType, isEmbed, enabled } : c
-            );
-        } else {
-            // Add new
-            updatedCommands.push({ trigger, response, matchType, isEmbed, enabled });
-        }
-
-        await fetchBotAPI(`/api/dashboard/guild/${guildId}/custom-commands`, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ commands: updatedCommands })
+        await fetchAPI(`/api/dashboard/guild/${guildId}/custom-commands`, {
+            method: 'POST',
+            body: JSON.stringify({ 
+                id, trigger, response, matchType, isEmbed, enabled 
+            })
         });
 
-        toast('Custom command saved ✅');
+        showToast('Custom command saved ✅', 'success');
         closeCustomCommandModal();
-        loadCustomCommands(guildId);
+        
+        // Refresh the list
+        fetchAPI(`/api/dashboard/guild/${guildId}/custom-commands`).then(res => renderCustomCommandsList(res.commands || res));
     } catch (e) {
-        toast('Failed to save custom command');
+        showToast('Failed to save custom command', 'error');
     }
 }
 

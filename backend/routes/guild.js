@@ -1,4 +1,5 @@
 const express = require('express');
+const axios = require('axios');
 const db = require('../database/connection');
 const { verifyDiscordToken } = require('./auth');
 
@@ -34,7 +35,7 @@ router.get('/settings', verifyDiscordToken, (req, res) => {
 });
 
 // Update guild settings
-router.patch('/settings', verifyDiscordToken, (req, res) => {
+router.patch('/settings', verifyDiscordToken, async (req, res) => {
     try {
         const { guildId } = req.params;
         const {
@@ -73,6 +74,19 @@ router.patch('/settings', verifyDiscordToken, (req, res) => {
 
         // Log the change
         logActivity(guildId, req.discordUser?.id, 'settings_updated', { fields: Object.keys(req.body) });
+
+        // Forward to Discord Bot API
+        const BOT_API = process.env.REAL_BOT_API || 'https://sofinshu-production.up.railway.app';
+        try {
+            await axios.patch(`${BOT_API}/api/dashboard/guild/${guildId}/settings`, req.body, {
+                headers: {
+                    'Authorization': req.headers.authorization,
+                    'Content-Type': 'application/json'
+                }
+            });
+        } catch (botErr) {
+            console.error('[Guild] Failed to sync settings to Bot API:', botErr.message);
+        }
 
         res.json({ success: true, message: 'Settings updated' });
     } catch (error) {
@@ -144,7 +158,7 @@ router.get('/promotion-requirements', verifyDiscordToken, (req, res) => {
 });
 
 // Update promotion requirements
-router.patch('/promotion-requirements', verifyDiscordToken, (req, res) => {
+router.patch('/promotion-requirements', verifyDiscordToken, async (req, res) => {
     try {
         const { guildId } = req.params;
         const { requirements, rankRoles, promotionChannel } = req.body;
@@ -204,6 +218,19 @@ router.patch('/promotion-requirements', verifyDiscordToken, (req, res) => {
 
         logActivity(guildId, req.discordUser?.id, 'promotion_requirements_updated', { ranks: Object.keys(requirements || {}) });
 
+        // Forward to Discord Bot API
+        const BOT_API = process.env.REAL_BOT_API || 'https://sofinshu-production.up.railway.app';
+        try {
+            await axios.patch(`${BOT_API}/api/dashboard/guild/${guildId}/promotion-requirements`, req.body, {
+                headers: {
+                    'Authorization': req.headers.authorization,
+                    'Content-Type': 'application/json'
+                }
+            });
+        } catch (botErr) {
+            console.error('[Guild] Failed to sync promotion requirements to Bot API:', botErr.message);
+        }
+
         res.json({ success: true, message: 'Promotion requirements updated' });
     } catch (error) {
         console.error('[Guild] Update promotion requirements error:', error);
@@ -236,7 +263,7 @@ router.get('/custom-commands', verifyDiscordToken, (req, res) => {
 });
 
 // Update custom commands
-router.patch('/custom-commands', verifyDiscordToken, (req, res) => {
+router.patch('/custom-commands', verifyDiscordToken, async (req, res) => {
     try {
         const { guildId } = req.params;
         const { commands } = req.body;
@@ -265,6 +292,19 @@ router.patch('/custom-commands', verifyDiscordToken, (req, res) => {
         }
 
         logActivity(guildId, req.discordUser?.id, 'custom_commands_updated', { count: commands?.length || 0 });
+
+        // Forward to Discord Bot API
+        const BOT_API = process.env.REAL_BOT_API || 'https://sofinshu-production.up.railway.app';
+        try {
+            await axios.patch(`${BOT_API}/api/dashboard/guild/${guildId}/custom-commands`, req.body, {
+                headers: {
+                    'Authorization': req.headers.authorization,
+                    'Content-Type': 'application/json'
+                }
+            });
+        } catch (botErr) {
+            console.error('[Guild] Failed to sync custom commands to Bot API:', botErr.message);
+        }
 
         res.json({ success: true, message: 'Custom commands updated' });
     } catch (error) {
