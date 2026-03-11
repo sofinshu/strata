@@ -6,6 +6,9 @@ const { verifyDiscordToken } = require('./auth');
 const router = express.Router();
 const DISCORD_API = 'https://discord.com/api/v10';
 
+// Simple in-memory cache for user guilds to prevent 429 rate limits
+const guildAccessCache = new Map();
+
 // Public stats endpoint
 router.get('/stats', (req, res) => {
     try {
@@ -36,12 +39,32 @@ router.get('/stats', (req, res) => {
 // Get user's managed guilds
 router.get('/guilds', verifyDiscordToken, async (req, res) => {
     try {
-        // Get user's guilds from Discord
-        const guildsRes = await axios.get(`${DISCORD_API}/users/@me/guilds`, {
-            headers: { Authorization: `Bearer ${req.discordToken}` }
-        });
-
-        const allGuilds = guildsRes.data;
+        const token = req.discordToken;
+        let allGuilds = null;
+        
+        // Check cache first (valid for 5 minutes)
+        if (guildAccessCache.has(token)) {
+            const cached = guildAccessCache.get(token);
+            if (Date.now() - cached.timestamp < 5 * 60 * 1000) {
+                allGuilds = cached.data;
+            } else {
+                guildAccessCache.delete(token); // expired
+            }
+        }
+        
+        // Fetch from Discord if not cached
+        if (!allGuilds) {
+            const guildsRes = await axios.get(`${DISCORD_API}/users/@me/guilds`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            allGuilds = guildsRes.data;
+            
+            // Save to cache
+            guildAccessCache.set(token, {
+                data: allGuilds,
+                timestamp: Date.now()
+            });
+        }
 
         // Filter guilds where user has Manage Server permission (0x20)
         const managedGuilds = allGuilds.filter(g => {
@@ -557,9 +580,6 @@ router.get('/guild/:guildId/ticket-logs', verifyDiscordToken, checkGuildAccess, 
         res.status(500).json({ error: 'Failed to fetch ticket logs' });
     }
 });
-
-// Simple in-memory cache for user guilds to prevent 429 rate limits
-const guildAccessCache = new Map();
 
 // Middleware to check guild access
 async function checkGuildAccess(req, res, next) {
