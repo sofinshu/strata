@@ -923,21 +923,6 @@ async function savePromotions() {
     }
 }
 
-// ── CUSTOM COMMANDS ──────────────────────────────────────────
-let currentCustomCommands = [];
-
-async function loadCustomCommands(guildId) {
-    const list = document.getElementById('customCommandsList');
-    if (!list) return;
-    try {
-        const data = await fetchAPI(`/api/dashboard/guild/${guildId}/custom-commands`);
-        currentCustomCommands = data.commands || [];
-        renderCustomCommands();
-    } catch {
-        list.innerHTML = '<div class="table-empty">Failed to load custom commands.</div>';
-    }
-}
-
 function renderCustomCommands() {
     const list = document.getElementById('customCommandsList');
     if (!list) return;
