@@ -962,7 +962,9 @@
             </div>
             <div class="form-row">
               <label>Alert Channel ID</label>
-              <input type="text" id="settingAlertChannel" placeholder="e.g. 1234567890123" class="form-input">
+              <select id="settingAlertChannel" class="form-input">
+                <option value="">Loading channels...</option>
+              </select>
             </div>
             <div class="form-row">
               <label>Pingable Role ID</label>
@@ -1003,12 +1005,16 @@
             <div class="form-row">
               <label>Panel Send Channel ID <span style="font-size:12px;color:#5c5c78;font-weight:400">(Where the "Apply"
                   button is posted)</span></label>
-              <input type="text" id="settingAppChannel" placeholder="Channel ID" class="form-input">
+              <select id="settingAppChannel" class="form-input">
+                <option value="">Loading channels...</option>
+              </select>
             </div>
             <div class="form-row">
               <label>Applications Review Channel ID <span style="font-size:12px;color:#5c5c78;font-weight:400">(Where
                   completed forms are sent)</span></label>
-              <input type="text" id="settingAppReview" placeholder="Channel ID" class="form-input">
+              <select id="settingAppReview" class="form-input">
+                <option value="">Loading channels...</option>
+              </select>
             </div>
             <div class="form-row">
               <label>Reviewer Role ID <span style="font-size:12px;color:#5c5c78;font-weight:400">(Who gets pinged for
@@ -1076,17 +1082,23 @@
           <div class="settings-form" id="settingsForm">
             <div class="form-row">
               <label>Mod / Moderation Log Channel ID</label>
-              <input type="text" id="settingModChannel" placeholder="e.g. 123456789012345678" class="form-input">
+              <select id="settingModChannel" class="form-input">
+                <option value="">Loading channels...</option>
+              </select>
             </div>
             <div class="form-row">
               <label>Staff Channel ID <span
                   style="color:#5c5c78;font-weight:400;text-transform:none;letter-spacing:0">(where staff commands are
                   posted)</span></label>
-              <input type="text" id="settingStaffChannel" placeholder="e.g. 123456789012345678" class="form-input">
+              <select id="settingStaffChannel" class="form-input">
+                <option value="">Loading channels...</option>
+              </select>
             </div>
             <div class="form-row">
               <label>General Log Channel ID</label>
-              <input type="text" id="settingLogChannel" placeholder="e.g. 123456789012345678" class="form-input">
+              <select id="settingLogChannel" class="form-input">
+                <option value="">Loading channels...</option>
+              </select>
             </div>
             <div class="form-row">
               <label>Warning Threshold (auto-demote)</label>
@@ -1114,6 +1126,12 @@
           <div class="card-title">🚀 Auto-Promotion System</div>
           <p class="card-desc">Configure automatic promotions. Staff are promoted when they meet all requirements for a
             rank.</p>
+          <div class="form-row" style="margin-bottom:20px;max-width:400px">
+            <label>Promotion Announcement Channel</label>
+            <select id="settingPromoChannel" class="form-input">
+              <option value="">Loading channels...</option>
+            </select>
+          </div>
           <div id="promoRankList" class="promo-list">
             <div class="table-empty">Loading promotion requirements...</div>
           </div>
@@ -1214,7 +1232,9 @@
             <div class="module-extra" id="am-log-opts" style="display:none">
               <div class="form-row" style="margin-top:12px">
                 <label>Log Channel ID</label>
-                <input type="text" id="am-log-channel" class="form-input" placeholder="e.g. 123456789012345678">
+                <select id="am-log-channel" class="form-input">
+                  <option value="">Loading channels...</option>
+                </select>
               </div>
             </div>
           </div>
@@ -1264,7 +1284,10 @@
             <div class="module-title" style="font-size:1rem;margin-bottom:15px">Level-Up Notifications</div>
             <div class="form-row">
               <label>Notification Channel ID</label>
-              <input type="text" id="lvl-channel" class="form-input" placeholder="Leave empty for current channel">
+              <select id="lvl-channel" class="form-input">
+                <option value="">Current Channel (default)</option>
+                <option value="">Loading channels...</option>
+              </select>
             </div>
             <div class="form-row" style="margin-top:16px">
               <label>Level-Up Message <span style="color:#5c5c78;font-weight:400;text-transform:none">(use {user}, {level}, {old_level})</span></label>
@@ -1316,7 +1339,9 @@
           <div class="sys-module">
             <div class="form-row">
               <label>Welcome Channel ID</label>
-              <input type="text" id="wlc-channel" class="form-input" placeholder="e.g. 123456789012345678">
+              <select id="wlc-channel" class="form-input">
+                <option value="">Loading channels...</option>
+              </select>
             </div>
             <div class="form-row" style="margin-top:16px">
               <label>Welcome Message <span
@@ -1366,7 +1391,9 @@
           <div class="sys-module">
             <div class="form-row">
               <label>Goodbye Channel ID</label>
-              <input type="text" id="gb-channel" class="form-input" placeholder="e.g. 123456789012345678">
+              <select id="gb-channel" class="form-input">
+                <option value="">Loading channels...</option>
+              </select>
             </div>
             <div class="form-row" style="margin-top:16px">
               <label>Goodbye Message <span
@@ -1455,8 +1482,8 @@
               </div>
               <label class="toggle"><input type="checkbox" id="log-members"><span class="toggle-slider"></span></label>
             </div>
-            <div class="form-row" style="margin-top:12px"><label>Log Channel ID</label><input type="text"
-                id="log-members-ch" class="form-input" placeholder="Channel ID"></div>
+            <div class="form-row" style="margin-top:12px"><label>Log Channel</label><select
+                id="log-members-ch" class="form-input"><option value="">Loading channels...</option></select></div>
           </div>
           <div class="sys-module">
             <div class="module-row">
@@ -1466,8 +1493,8 @@
               </div>
               <label class="toggle"><input type="checkbox" id="log-messages"><span class="toggle-slider"></span></label>
             </div>
-            <div class="form-row" style="margin-top:12px"><label>Log Channel ID</label><input type="text"
-                id="log-messages-ch" class="form-input" placeholder="Channel ID"></div>
+            <div class="form-row" style="margin-top:12px"><label>Log Channel</label><select
+                id="log-messages-ch" class="form-input"><option value="">Loading channels...</option></select></div>
           </div>
           <div class="sys-module">
             <div class="module-row">
@@ -1477,8 +1504,8 @@
               </div>
               <label class="toggle"><input type="checkbox" id="log-mod"><span class="toggle-slider"></span></label>
             </div>
-            <div class="form-row" style="margin-top:12px"><label>Log Channel ID</label><input type="text"
-                id="log-mod-ch" class="form-input" placeholder="Channel ID"></div>
+            <div class="form-row" style="margin-top:12px"><label>Log Channel</label><select
+                id="log-mod-ch" class="form-input"><option value="">Loading channels...</option></select></div>
           </div>
           <div class="sys-module">
             <div class="module-row">
@@ -1488,8 +1515,8 @@
               </div>
               <label class="toggle"><input type="checkbox" id="log-roles"><span class="toggle-slider"></span></label>
             </div>
-            <div class="form-row" style="margin-top:12px"><label>Log Channel ID</label><input type="text"
-                id="log-roles-ch" class="form-input" placeholder="Channel ID"></div>
+            <div class="form-row" style="margin-top:12px"><label>Log Channel</label><select
+                id="log-roles-ch" class="form-input"><option value="">Loading channels...</option></select></div>
           </div>
           <div class="sys-module">
             <div class="module-row">
@@ -1499,8 +1526,8 @@
               </div>
               <label class="toggle"><input type="checkbox" id="log-voice"><span class="toggle-slider"></span></label>
             </div>
-            <div class="form-row" style="margin-top:12px"><label>Log Channel ID</label><input type="text"
-                id="log-voice-ch" class="form-input" placeholder="Channel ID"></div>
+            <div class="form-row" style="margin-top:12px"><label>Log Channel</label><select
+                id="log-voice-ch" class="form-input"><option value="">Loading channels...</option></select></div>
           </div>
         </div>
       </div>
@@ -1562,8 +1589,10 @@
           </div>
           <div class="sys-module">
             <div class="form-row">
-              <label>Log Spam to Channel (optional)</label>
-              <input type="text" id="as-log-ch" class="form-input" placeholder="Channel ID">
+              <select id="as-log-ch" class="form-input">
+                <option value="">No logging (optional)</option>
+                <option value="">Loading channels...</option>
+              </select>
             </div>
           </div>
         </div>
@@ -1594,7 +1623,9 @@
               <label>Ticket Panel Channel ID <span
                   style="color:#5c5c78;font-weight:400;text-transform:none;letter-spacing:0">(where the open-ticket
                   button is posted)</span></label>
-              <input type="text" id="tk-panel-ch" class="form-input" placeholder="Channel ID">
+              <select id="tk-panel-ch" class="form-input">
+                <option value="">Loading channels...</option>
+              </select>
             </div>
             <div class="form-row" style="margin-top:14px">
               <label>Ticket Category ID <span
@@ -1627,7 +1658,9 @@
             </div>
             <div class="form-row" style="margin-top:12px">
               <label>Transcript Log Channel ID</label>
-              <input type="text" id="tk-transcript-ch" class="form-input" placeholder="Channel ID">
+              <select id="tk-transcript-ch" class="form-input">
+                <option value="">Loading channels...</option>
+              </select>
             </div>
           </div>
           <div class="sys-module">

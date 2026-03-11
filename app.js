@@ -415,11 +415,42 @@ async function loadDashboardData() {
         loadLeaderboard(guildId);
         loadSettings(guildId);
         loadPromotions(guildId);
+        fetchGuildChannels(guildId);
         toast('Data synced ✅');
     } catch (e) {
         console.error(e);
         toast('Error loading data');
     }
+}
+
+async function fetchGuildChannels(guildId) {
+    const channels = await fetchBotAPI(`/api/dashboard/guild/${guildId}/channels`);
+    if (channels && Array.isArray(channels)) {
+        populateChannelSelects(channels);
+    }
+}
+
+function populateChannelSelects(channels) {
+    const selects = [
+        'wlc-channel', 'gb-channel', 'log-members-ch', 'log-messages-ch',
+        'log-mod-ch', 'log-roles-ch', 'log-voice-ch', 'as-log-ch',
+        'tk-panel-ch', 'tk-transcript-ch', 'settingLogChannel', 'settingStaffChannel', 'settingModChannel', 'settingPromoChannel',
+        'lvl-channel', 'am-log-channel', 'settingAlertChannel', 'settingAppChannel', 'settingAppReview'
+    ];
+
+    selects.forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+
+        const currentValue = el.value;
+        const isOptional = id === 'as-log-ch';
+        
+        let html = isOptional ? '<option value="">No logging (optional)</option>' : '<option value="">Select a channel...</option>';
+        html += channels.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+        
+        el.innerHTML = html;
+        if (currentValue) el.value = currentValue;
+    });
 }
 
 
