@@ -558,17 +558,42 @@ router.get('/guild/:guildId/ticket-logs', verifyDiscordToken, checkGuildAccess, 
     }
 });
 
+// Simple in-memory cache for user guilds to prevent 429 rate limits
+const guildAccessCache = new Map();
+
 // Middleware to check guild access
 async function checkGuildAccess(req, res, next) {
     const { guildId } = req.params;
+    const token = req.discordToken;
     
     try {
-        // Verify user has access to this guild
-        const guildsRes = await axios.get(`${DISCORD_API}/users/@me/guilds`, {
-            headers: { Authorization: `Bearer ${req.discordToken}` }
-        });
+        let userGuilds = null;
+        
+        // Check cache first (valid for 5 minutes)
+        if (guildAccessCache.has(token)) {
+            const cached = guildAccessCache.get(token);
+            if (Date.now() - cached.timestamp < 5 * 60 * 1000) {
+                userGuilds = cached.data;
+            } else {
+                guildAccessCache.delete(token); // expired
+            }
+        }
+        
+        // Fetch from Discord if not cached
+        if (!userGuilds) {
+            const guildsRes = await axios.get(`${DISCORD_API}/users/@me/guilds`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            userGuilds = guildsRes.data;
+            
+            // Save to cache
+            guildAccessCache.set(token, {
+                data: userGuilds,
+                timestamp: Date.now()
+            });
+        }
 
-        const guild = guildsRes.data.find(g => g.id === guildId);
+        const guild = userGuilds.find(g => g.id === guildId);
         
         if (!guild) {
             return res.status(403).json({ error: 'Access denied to this guild' });
