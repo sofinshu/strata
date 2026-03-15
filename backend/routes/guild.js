@@ -573,15 +573,15 @@ function logActivity(guildId, userId, actionType, metadata) {
 router.get('/channels', verifyDiscordToken, async (req, res) => {
     try {
         const { guildId } = req.params;
-        const BOT_API = process.env.REAL_BOT_API || process.env.DISCORD_TOKEN;
+        const BOT_TOKEN = process.env.DISCORD_TOKEN;
         
-        if (!BOT_API) {
-            return res.status(500).json({ error: 'Bot API token not configured' });
+        if (!BOT_TOKEN) {
+            return res.status(500).json({ error: 'Bot token not configured' });
         }
 
         const response = await axios.get(`https://discord.com/api/v10/guilds/${guildId}/channels`, {
             headers: {
-                'Authorization': `Bot ${BOT_API}`,
+                'Authorization': `Bot ${BOT_TOKEN}`,
                 'Content-Type': 'application/json'
             }
         });
