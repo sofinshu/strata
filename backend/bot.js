@@ -21,7 +21,7 @@ try {
     console.error('[Bot] Database connection failed:', err.message);
 }
 
-client.once('ready', () => {
+client.once('clientReady', () => {
     console.log(`[Bot] Logged in as ${client.user.tag}`);
     console.log(`[Bot] Serving ${client.guilds.cache.size} guilds`);
     client.user.setActivity('staff management', { type: ActivityType.Watching });
