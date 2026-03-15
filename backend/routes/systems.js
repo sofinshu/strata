@@ -70,15 +70,17 @@ router.patch('/systems/:system', verifyDiscordToken, async (req, res) => {
 
         // Forward to Discord Bot API to sync MongoDB and clear cache
         const BOT_API = process.env.REAL_BOT_API || 'https://sofinshu-production.up.railway.app';
+        const BOT_API_KEY = process.env.BOT_API_KEY || process.env.REAL_BOT_API;
         try {
             await axios.patch(`${BOT_API}/api/dashboard/guild/${guildId}/systems/${system}`, data, {
                 headers: {
-                    'Authorization': req.headers.authorization,
+                    'Authorization': `Bearer ${BOT_API_KEY}`,
                     'Content-Type': 'application/json'
                 }
             });
         } catch (botErr) {
-            console.error(`[Systems] Failed to sync ${system} config to Bot API:`, botErr.message);
+            console.error(`[Systems] Failed to sync ${system} config to Bot API:`, botErr.message, botErr.response?.data);
+            return res.status(500).json({ success: false, error: 'Failed to sync ' + system + ' config to bot: ' + botErr.message });
         }
 
         // Log activity
