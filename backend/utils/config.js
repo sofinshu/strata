@@ -1,7 +1,11 @@
 function isValidUrl(string) {
     if (!string || typeof string !== 'string') return false;
-    const trimmed = string.trim();
-    return trimmed.startsWith('http://') || trimmed.startsWith('https://');
+    try {
+        const url = new URL(string.trim());
+        return url.protocol === 'http:' || url.protocol === 'https:';
+    } catch {
+        return false;
+    }
 }
 
 function getBotApiConfig(caller = 'unknown') {
