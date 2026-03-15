@@ -5,6 +5,16 @@ const { verifyDiscordToken } = require('./auth');
 
 const router = express.Router({ mergeParams: true });
 
+function getBotApiConfig() {
+    const REAL_BOT_API = process.env.REAL_BOT_API;
+    if (!REAL_BOT_API || REAL_BOT_API === 'undefined' || REAL_BOT_API.trim() === '') {
+        return { BOT_API: null, BOT_API_KEY: null };
+    }
+    const BOT_API_KEY = process.env.BOT_API_KEY || process.env.REAL_BOT_API;
+    const apiKey = (!BOT_API_KEY || BOT_API_KEY === 'undefined' || BOT_API_KEY.trim() === '') ? null : BOT_API_KEY;
+    return { BOT_API: REAL_BOT_API, BOT_API_KEY: apiKey };
+}
+
 // Available systems
 const SYSTEMS = ['automod', 'welcome', 'goodbye', 'autorole', 'logging', 'antispam', 'tickets', 'leveling', 'economy', 'giveaways'];
 
@@ -68,22 +78,21 @@ router.patch('/systems/:system', verifyDiscordToken, async (req, res) => {
 
         stmt.run(guildId, system, JSON.stringify(config), enabled ? 1 : 0);
 
-        // Forward to Discord Bot API to sync MongoDB and clear cache
-        let BOT_API = process.env.REAL_BOT_API;
-        if (!BOT_API || BOT_API === 'undefined' || BOT_API.trim() === '') {
-            BOT_API = 'https://sofinshu-production.up.railway.app';
-        }
-        const BOT_API_KEY = process.env.BOT_API_KEY || process.env.REAL_BOT_API;
-        try {
-            await axios.patch(`${BOT_API}/api/dashboard/guild/${guildId}/systems/${system}`, data, {
-                headers: {
-                    'Authorization': `Bearer ${BOT_API_KEY}`,
-                    'Content-Type': 'application/json'
-                }
-            });
-        } catch (botErr) {
-            console.error(`[Systems] Failed to sync ${system} config to Bot API:`, botErr.message, botErr.response?.data);
-            return res.status(500).json({ success: false, error: 'Failed to sync ' + system + ' config to bot: ' + botErr.message });
+        const { BOT_API, BOT_API_KEY } = getBotApiConfig();
+        if (!BOT_API || !BOT_API_KEY) {
+            console.warn('[Systems] REAL_BOT_API not configured, skipping Bot API sync');
+        } else {
+            try {
+                await axios.patch(`${BOT_API}/api/dashboard/guild/${guildId}/systems/${system}`, data, {
+                    headers: {
+                        'Authorization': `Bearer ${BOT_API_KEY}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+            } catch (botErr) {
+                console.error(`[Systems] Failed to sync ${system} config to Bot API:`, botErr.message, botErr.response?.data);
+                return res.status(500).json({ success: false, error: 'Failed to sync ' + system + ' config to bot: ' + botErr.message });
+            }
         }
 
         // Log activity
