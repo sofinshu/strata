@@ -367,7 +367,7 @@ router.get('/staff-rewards', verifyDiscordToken, (req, res) => {
 });
 
 // Update staff rewards
-router.patch('/staff-rewards', verifyDiscordToken, (req, res) => {
+router.patch('/staff-rewards', verifyDiscordToken, async (req, res) => {
     try {
         const { guildId } = req.params;
         const { achievements, roleRewards } = req.body;
@@ -415,6 +415,19 @@ router.patch('/staff-rewards', verifyDiscordToken, (req, res) => {
             roleRewards: roleRewards?.length || 0
         });
 
+        // Forward to Discord Bot API
+        const BOT_API = process.env.REAL_BOT_API || 'https://sofinshu-production.up.railway.app';
+        try {
+            await axios.patch(`${BOT_API}/api/dashboard/guild/${guildId}/staff-rewards`, req.body, {
+                headers: {
+                    'Authorization': req.headers.authorization,
+                    'Content-Type': 'application/json'
+                }
+            });
+        } catch (botErr) {
+            console.error('[Guild] Failed to sync staff rewards to Bot API:', botErr.message);
+        }
+
         res.json({ success: true, message: 'Staff rewards updated' });
     } catch (error) {
         console.error('[Guild] Update staff rewards error:', error);
@@ -436,16 +449,16 @@ router.get('/branding', verifyDiscordToken, (req, res) => {
 });
 
 // Update root-level configs
-router.patch('/alerts', verifyDiscordToken, (req, res) => {
-    updateSystemConfig(req.params.guildId, 'alerts', req.body, req.discordUser?.id, res);
+router.patch('/alerts', verifyDiscordToken, async (req, res) => {
+    await updateSystemConfig(req.params.guildId, 'alerts', req.body, req.discordUser?.id, res, req.headers.authorization);
 });
 
-router.patch('/applications', verifyDiscordToken, (req, res) => {
-    updateSystemConfig(req.params.guildId, 'applications', req.body, req.discordUser?.id, res);
+router.patch('/applications', verifyDiscordToken, async (req, res) => {
+    await updateSystemConfig(req.params.guildId, 'applications', req.body, req.discordUser?.id, res, req.headers.authorization);
 });
 
-router.patch('/branding', verifyDiscordToken, (req, res) => {
-    updateSystemConfig(req.params.guildId, 'branding', req.body, req.discordUser?.id, res);
+router.patch('/branding', verifyDiscordToken, async (req, res) => {
+    await updateSystemConfig(req.params.guildId, 'branding', req.body, req.discordUser?.id, res, req.headers.authorization);
 });
 
 // Helper functions
@@ -470,7 +483,7 @@ function getSystemConfig(guildId, systemType, res) {
     }
 }
 
-function updateSystemConfig(guildId, systemType, data, userId, res) {
+async function updateSystemConfig(guildId, systemType, data, userId, res, authHeader) {
     try {
         const stmt = db.prepare(`
             INSERT INTO system_configs (guild_id, system_type, config_json, enabled)
@@ -488,6 +501,19 @@ function updateSystemConfig(guildId, systemType, data, userId, res) {
         stmt.run(guildId, systemType, JSON.stringify(config), enabled ? 1 : 0);
 
         logActivity(guildId, userId, `${systemType}_updated`, { enabled });
+
+        // Forward to Discord Bot API
+        const BOT_API = process.env.REAL_BOT_API || 'https://sofinshu-production.up.railway.app';
+        try {
+            await axios.patch(`${BOT_API}/api/dashboard/guild/${guildId}/${systemType}`, data, {
+                headers: {
+                    'Authorization': authHeader,
+                    'Content-Type': 'application/json'
+                }
+            });
+        } catch (botErr) {
+            console.error(`[Guild] Failed to sync ${systemType} to Bot API:`, botErr.message);
+        }
 
         res.json({ success: true, message: 'Configuration updated' });
     } catch (error) {
