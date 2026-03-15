@@ -72,7 +72,7 @@ async function handleOAuthReturn() {
 
         const user = await userRes.json();
         console.log('[Dashboard] Logged in as:', user.username);
-        showToast(`Welcome, ${user.username}! ðŸ‘‹`, 'success');
+        showToast(`Welcome, ${user.username}! 👋`, 'success');
 
         // Show guild picker
         await showGuildPicker();
