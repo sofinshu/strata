@@ -2,18 +2,9 @@ const express = require('express');
 const axios = require('axios');
 const db = require('../database/connection');
 const { verifyDiscordToken } = require('./auth');
+const { getBotApiConfig } = require('../utils/config');
 
 const router = require('express').Router({ mergeParams: true });
-
-function getBotApiConfig() {
-    const REAL_BOT_API = process.env.REAL_BOT_API;
-    if (!REAL_BOT_API || REAL_BOT_API === 'undefined' || REAL_BOT_API.trim() === '') {
-        return { BOT_API: null, BOT_API_KEY: null };
-    }
-    const BOT_API_KEY = process.env.BOT_API_KEY || process.env.REAL_BOT_API;
-    const apiKey = (!BOT_API_KEY || BOT_API_KEY === 'undefined' || BOT_API_KEY.trim() === '') ? null : BOT_API_KEY;
-    return { BOT_API: REAL_BOT_API, BOT_API_KEY: apiKey };
-}
 
 // Get guild settings
 router.get('/settings', verifyDiscordToken, (req, res) => {
@@ -85,9 +76,8 @@ router.patch('/settings', verifyDiscordToken, async (req, res) => {
         // Log the change
         logActivity(guildId, req.discordUser?.id, 'settings_updated', { fields: Object.keys(req.body) });
 
-        const { BOT_API, BOT_API_KEY } = getBotApiConfig();
+        const { BOT_API, BOT_API_KEY } = getBotApiConfig('guild');
         if (!BOT_API || !BOT_API_KEY) {
-            console.warn('[Guild] REAL_BOT_API not configured, skipping Bot API sync');
         } else {
             try {
                 await axios.patch(`${BOT_API}/api/dashboard/guild/${guildId}/settings`, req.body, {
@@ -232,9 +222,8 @@ router.patch('/promotion-requirements', verifyDiscordToken, async (req, res) => 
 
         logActivity(guildId, req.discordUser?.id, 'promotion_requirements_updated', { ranks: Object.keys(requirements || {}) });
 
-        const { BOT_API, BOT_API_KEY } = getBotApiConfig();
+        const { BOT_API, BOT_API_KEY } = getBotApiConfig('guild');
         if (!BOT_API || !BOT_API_KEY) {
-            console.warn('[Guild] REAL_BOT_API not configured, skipping Bot API sync');
         } else {
             try {
                 await axios.patch(`${BOT_API}/api/dashboard/guild/${guildId}/promotion-requirements`, req.body, {
@@ -311,9 +300,8 @@ router.patch('/custom-commands', verifyDiscordToken, async (req, res) => {
 
         logActivity(guildId, req.discordUser?.id, 'custom_commands_updated', { count: commands?.length || 0 });
 
-        const { BOT_API, BOT_API_KEY } = getBotApiConfig();
+        const { BOT_API, BOT_API_KEY } = getBotApiConfig('guild');
         if (!BOT_API || !BOT_API_KEY) {
-            console.warn('[Guild] REAL_BOT_API not configured, skipping Bot API sync');
         } else {
             try {
                 await axios.patch(`${BOT_API}/api/dashboard/guild/${guildId}/custom-commands`, req.body, {
@@ -437,9 +425,8 @@ router.patch('/staff-rewards', verifyDiscordToken, async (req, res) => {
             roleRewards: roleRewards?.length || 0
         });
 
-        const { BOT_API, BOT_API_KEY } = getBotApiConfig();
+        const { BOT_API, BOT_API_KEY } = getBotApiConfig('guild');
         if (!BOT_API || !BOT_API_KEY) {
-            console.warn('[Guild] REAL_BOT_API not configured, skipping Bot API sync');
         } else {
             try {
                 await axios.patch(`${BOT_API}/api/dashboard/guild/${guildId}/staff-rewards`, req.body, {
@@ -528,9 +515,8 @@ async function updateSystemConfig(guildId, systemType, data, userId, res) {
 
         logActivity(guildId, userId, `${systemType}_updated`, { enabled });
 
-        const { BOT_API, BOT_API_KEY } = getBotApiConfig();
+        const { BOT_API, BOT_API_KEY } = getBotApiConfig('guild');
         if (!BOT_API || !BOT_API_KEY) {
-            console.warn(`[Guild] REAL_BOT_API not configured, skipping Bot API sync`);
         } else {
             try {
                 await axios.patch(`${BOT_API}/api/dashboard/guild/${guildId}/${systemType}`, data, {
