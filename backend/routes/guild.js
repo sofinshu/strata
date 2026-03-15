@@ -76,7 +76,10 @@ router.patch('/settings', verifyDiscordToken, async (req, res) => {
         logActivity(guildId, req.discordUser?.id, 'settings_updated', { fields: Object.keys(req.body) });
 
         // Forward to Discord Bot API
-        const BOT_API = process.env.REAL_BOT_API || 'https://sofinshu-production.up.railway.app';
+        let BOT_API = process.env.REAL_BOT_API;
+        if (!BOT_API || BOT_API === 'undefined' || BOT_API.trim() === '') {
+            BOT_API = 'https://sofinshu-production.up.railway.app';
+        }
         const BOT_API_KEY = process.env.BOT_API_KEY || process.env.REAL_BOT_API;
         try {
             await axios.patch(`${BOT_API}/api/dashboard/guild/${guildId}/settings`, req.body, {
@@ -221,7 +224,10 @@ router.patch('/promotion-requirements', verifyDiscordToken, async (req, res) => 
         logActivity(guildId, req.discordUser?.id, 'promotion_requirements_updated', { ranks: Object.keys(requirements || {}) });
 
         // Forward to Discord Bot API
-        const BOT_API = process.env.REAL_BOT_API || 'https://sofinshu-production.up.railway.app';
+        let BOT_API = process.env.REAL_BOT_API;
+        if (!BOT_API || BOT_API === 'undefined' || BOT_API.trim() === '') {
+            BOT_API = 'https://sofinshu-production.up.railway.app';
+        }
         const BOT_API_KEY = process.env.BOT_API_KEY || process.env.REAL_BOT_API;
         try {
             await axios.patch(`${BOT_API}/api/dashboard/guild/${guildId}/promotion-requirements`, req.body, {
@@ -298,7 +304,10 @@ router.patch('/custom-commands', verifyDiscordToken, async (req, res) => {
         logActivity(guildId, req.discordUser?.id, 'custom_commands_updated', { count: commands?.length || 0 });
 
         // Forward to Discord Bot API
-        const BOT_API = process.env.REAL_BOT_API || 'https://sofinshu-production.up.railway.app';
+        let BOT_API = process.env.REAL_BOT_API;
+        if (!BOT_API || BOT_API === 'undefined' || BOT_API.trim() === '') {
+            BOT_API = 'https://sofinshu-production.up.railway.app';
+        }
         const BOT_API_KEY = process.env.BOT_API_KEY || process.env.REAL_BOT_API;
         try {
             await axios.patch(`${BOT_API}/api/dashboard/guild/${guildId}/custom-commands`, req.body, {
@@ -422,7 +431,10 @@ router.patch('/staff-rewards', verifyDiscordToken, async (req, res) => {
         });
 
         // Forward to Discord Bot API
-        const BOT_API = process.env.REAL_BOT_API || 'https://sofinshu-production.up.railway.app';
+        let BOT_API = process.env.REAL_BOT_API;
+        if (!BOT_API || BOT_API === 'undefined' || BOT_API.trim() === '') {
+            BOT_API = 'https://sofinshu-production.up.railway.app';
+        }
         const BOT_API_KEY = process.env.BOT_API_KEY || process.env.REAL_BOT_API;
         try {
             await axios.patch(`${BOT_API}/api/dashboard/guild/${guildId}/staff-rewards`, req.body, {
@@ -511,7 +523,10 @@ async function updateSystemConfig(guildId, systemType, data, userId, res) {
         logActivity(guildId, userId, `${systemType}_updated`, { enabled });
 
         // Forward to Discord Bot API
-        const BOT_API = process.env.REAL_BOT_API || 'https://sofinshu-production.up.railway.app';
+        let BOT_API = process.env.REAL_BOT_API;
+        if (!BOT_API || BOT_API === 'undefined' || BOT_API.trim() === '') {
+            BOT_API = 'https://sofinshu-production.up.railway.app';
+        }
         const BOT_API_KEY = process.env.BOT_API_KEY || process.env.REAL_BOT_API;
         try {
             await axios.patch(`${BOT_API}/api/dashboard/guild/${guildId}/${systemType}`, data, {
