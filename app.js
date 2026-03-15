@@ -424,9 +424,31 @@ async function loadDashboardData() {
 }
 
 async function fetchGuildChannels(guildId) {
-    const channels = await fetchBotAPI(`/api/dashboard/guild/${guildId}/channels`);
+    let channels = null;
+    
+    try {
+        channels = await fetchBotAPI(`/api/dashboard/guild/${guildId}/channels`);
+    } catch (e) {
+        console.warn('[Channels] External API failed, trying fallback');
+    }
+    
+    if (!channels || !Array.isArray(channels)) {
+        try {
+            const res = await fetch(`${CONFIG.API_BASE}/api/dashboard/guild/${guildId}/channels`, {
+                headers: { Authorization: `Bearer ${accessToken}` }
+            });
+            if (res.ok) {
+                channels = await res.json();
+            }
+        } catch (e) {
+            console.warn('[Channels] Fallback API failed:', e);
+        }
+    }
+    
     if (channels && Array.isArray(channels)) {
         populateChannelSelects(channels);
+    } else {
+        populateChannelSelects([]);
     }
 }
 
