@@ -77,15 +77,17 @@ router.patch('/settings', verifyDiscordToken, async (req, res) => {
 
         // Forward to Discord Bot API
         const BOT_API = process.env.REAL_BOT_API || 'https://sofinshu-production.up.railway.app';
+        const BOT_API_KEY = process.env.BOT_API_KEY || process.env.REAL_BOT_API;
         try {
             await axios.patch(`${BOT_API}/api/dashboard/guild/${guildId}/settings`, req.body, {
                 headers: {
-                    'Authorization': req.headers.authorization,
+                    'Authorization': `Bearer ${BOT_API_KEY}`,
                     'Content-Type': 'application/json'
                 }
             });
         } catch (botErr) {
-            console.error('[Guild] Failed to sync settings to Bot API:', botErr.message);
+            console.error('[Guild] Failed to sync settings to Bot API:', botErr.message, botErr.response?.data);
+            return res.status(500).json({ success: false, error: 'Failed to sync settings to bot: ' + botErr.message });
         }
 
         res.json({ success: true, message: 'Settings updated' });
@@ -220,15 +222,17 @@ router.patch('/promotion-requirements', verifyDiscordToken, async (req, res) => 
 
         // Forward to Discord Bot API
         const BOT_API = process.env.REAL_BOT_API || 'https://sofinshu-production.up.railway.app';
+        const BOT_API_KEY = process.env.BOT_API_KEY || process.env.REAL_BOT_API;
         try {
             await axios.patch(`${BOT_API}/api/dashboard/guild/${guildId}/promotion-requirements`, req.body, {
                 headers: {
-                    'Authorization': req.headers.authorization,
+                    'Authorization': `Bearer ${BOT_API_KEY}`,
                     'Content-Type': 'application/json'
                 }
             });
         } catch (botErr) {
-            console.error('[Guild] Failed to sync promotion requirements to Bot API:', botErr.message);
+            console.error('[Guild] Failed to sync promotion requirements to Bot API:', botErr.message, botErr.response?.data);
+            return res.status(500).json({ success: false, error: 'Failed to sync promotion requirements to bot: ' + botErr.message });
         }
 
         res.json({ success: true, message: 'Promotion requirements updated' });
@@ -295,15 +299,17 @@ router.patch('/custom-commands', verifyDiscordToken, async (req, res) => {
 
         // Forward to Discord Bot API
         const BOT_API = process.env.REAL_BOT_API || 'https://sofinshu-production.up.railway.app';
+        const BOT_API_KEY = process.env.BOT_API_KEY || process.env.REAL_BOT_API;
         try {
             await axios.patch(`${BOT_API}/api/dashboard/guild/${guildId}/custom-commands`, req.body, {
                 headers: {
-                    'Authorization': req.headers.authorization,
+                    'Authorization': `Bearer ${BOT_API_KEY}`,
                     'Content-Type': 'application/json'
                 }
             });
         } catch (botErr) {
-            console.error('[Guild] Failed to sync custom commands to Bot API:', botErr.message);
+            console.error('[Guild] Failed to sync custom commands to Bot API:', botErr.message, botErr.response?.data);
+            return res.status(500).json({ success: false, error: 'Failed to sync custom commands to bot: ' + botErr.message });
         }
 
         res.json({ success: true, message: 'Custom commands updated' });
@@ -417,15 +423,17 @@ router.patch('/staff-rewards', verifyDiscordToken, async (req, res) => {
 
         // Forward to Discord Bot API
         const BOT_API = process.env.REAL_BOT_API || 'https://sofinshu-production.up.railway.app';
+        const BOT_API_KEY = process.env.BOT_API_KEY || process.env.REAL_BOT_API;
         try {
             await axios.patch(`${BOT_API}/api/dashboard/guild/${guildId}/staff-rewards`, req.body, {
                 headers: {
-                    'Authorization': req.headers.authorization,
+                    'Authorization': `Bearer ${BOT_API_KEY}`,
                     'Content-Type': 'application/json'
                 }
             });
         } catch (botErr) {
-            console.error('[Guild] Failed to sync staff rewards to Bot API:', botErr.message);
+            console.error('[Guild] Failed to sync staff rewards to Bot API:', botErr.message, botErr.response?.data);
+            return res.status(500).json({ success: false, error: 'Failed to sync staff rewards to bot: ' + botErr.message });
         }
 
         res.json({ success: true, message: 'Staff rewards updated' });
@@ -450,15 +458,15 @@ router.get('/branding', verifyDiscordToken, (req, res) => {
 
 // Update root-level configs
 router.patch('/alerts', verifyDiscordToken, async (req, res) => {
-    await updateSystemConfig(req.params.guildId, 'alerts', req.body, req.discordUser?.id, res, req.headers.authorization);
+    await updateSystemConfig(req.params.guildId, 'alerts', req.body, req.discordUser?.id, res);
 });
 
 router.patch('/applications', verifyDiscordToken, async (req, res) => {
-    await updateSystemConfig(req.params.guildId, 'applications', req.body, req.discordUser?.id, res, req.headers.authorization);
+    await updateSystemConfig(req.params.guildId, 'applications', req.body, req.discordUser?.id, res);
 });
 
 router.patch('/branding', verifyDiscordToken, async (req, res) => {
-    await updateSystemConfig(req.params.guildId, 'branding', req.body, req.discordUser?.id, res, req.headers.authorization);
+    await updateSystemConfig(req.params.guildId, 'branding', req.body, req.discordUser?.id, res);
 });
 
 // Helper functions
@@ -483,7 +491,7 @@ function getSystemConfig(guildId, systemType, res) {
     }
 }
 
-async function updateSystemConfig(guildId, systemType, data, userId, res, authHeader) {
+async function updateSystemConfig(guildId, systemType, data, userId, res) {
     try {
         const stmt = db.prepare(`
             INSERT INTO system_configs (guild_id, system_type, config_json, enabled)
@@ -504,15 +512,17 @@ async function updateSystemConfig(guildId, systemType, data, userId, res, authHe
 
         // Forward to Discord Bot API
         const BOT_API = process.env.REAL_BOT_API || 'https://sofinshu-production.up.railway.app';
+        const BOT_API_KEY = process.env.BOT_API_KEY || process.env.REAL_BOT_API;
         try {
             await axios.patch(`${BOT_API}/api/dashboard/guild/${guildId}/${systemType}`, data, {
                 headers: {
-                    'Authorization': authHeader,
+                    'Authorization': `Bearer ${BOT_API_KEY}`,
                     'Content-Type': 'application/json'
                 }
             });
         } catch (botErr) {
-            console.error(`[Guild] Failed to sync ${systemType} to Bot API:`, botErr.message);
+            console.error(`[Guild] Failed to sync ${systemType} to Bot API:`, botErr.message, botErr.response?.data);
+            return res.status(500).json({ success: false, error: `Failed to sync ${systemType} to bot: ` + botErr.message });
         }
 
         res.json({ success: true, message: 'Configuration updated' });
