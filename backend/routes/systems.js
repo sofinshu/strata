@@ -55,6 +55,8 @@ router.patch('/systems/:system', verifyDiscordToken, async (req, res) => {
         const { guildId, system } = req.params;
         const data = req.body;
         
+        console.log(`[Systems] PATCH /systems/${system} - Received data:`, JSON.stringify(data));
+        
         if (!SYSTEMS.includes(system)) {
             return res.status(404).json({ error: 'Unknown system' });
         }
@@ -83,6 +85,7 @@ router.patch('/systems/:system', verifyDiscordToken, async (req, res) => {
             console.warn('[Systems] REAL_BOT_API not configured, skipping Bot API sync');
         } else {
             try {
+                console.log(`[Systems] Syncing ${system} to Bot API at: ${BOT_API}/api/dashboard/guild/${guildId}/systems/${system}`);
                 await axios.patch(`${BOT_API}/api/dashboard/guild/${guildId}/systems/${system}`, data, {
                     headers: {
                         'Authorization': `Bearer ${BOT_API_KEY}`,
@@ -101,6 +104,7 @@ router.patch('/systems/:system', verifyDiscordToken, async (req, res) => {
         res.json({ success: true, message: `${system} configuration saved` });
     } catch (error) {
         console.error(`[Systems] Update ${req.params.system} error:`, error);
+        console.error('[Systems] Full error stack:', error.stack);
         res.status(500).json({ error: 'Failed to update system configuration' });
     }
 });
