@@ -569,4 +569,35 @@ function logActivity(guildId, userId, actionType, metadata) {
     }
 }
 
+// Get channels from Discord using bot token
+router.get('/channels', verifyDiscordToken, async (req, res) => {
+    try {
+        const { guildId } = req.params;
+        const BOT_API = process.env.REAL_BOT_API || process.env.DISCORD_TOKEN;
+        
+        if (!BOT_API) {
+            return res.status(500).json({ error: 'Bot API token not configured' });
+        }
+
+        const response = await axios.get(`https://discord.com/api/v10/guilds/${guildId}/channels`, {
+            headers: {
+                'Authorization': `Bot ${BOT_API}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        const channels = response.data.map(ch => ({
+            id: ch.id,
+            name: ch.name,
+            type: ch.type,
+            parentId: ch.parent_id
+        }));
+
+        res.json(channels);
+    } catch (error) {
+        console.error('[Guild] Get channels error:', error.message);
+        res.status(500).json({ error: 'Failed to fetch channels from Discord' });
+    }
+});
+
 module.exports = router;
