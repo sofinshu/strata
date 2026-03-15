@@ -83,14 +83,18 @@ router.patch('/systems/:system', verifyDiscordToken, async (req, res) => {
             console.warn('[Systems] REAL_BOT_API not configured, skipping Bot API sync');
         } else {
             try {
-                await axios.patch(`${BOT_API}/api/dashboard/guild/${guildId}/systems/${system}`, data, {
+                const apiUrl = `${BOT_API}/api/dashboard/guild/${guildId}/systems/${system}`;
+                console.log('[Systems] Frontend data sent:', JSON.stringify(data));
+                console.log('[Systems] Bot API URL:', apiUrl);
+                await axios.patch(apiUrl, data, {
                     headers: {
                         'Authorization': `Bearer ${BOT_API_KEY}`,
                         'Content-Type': 'application/json'
                     }
                 });
             } catch (botErr) {
-                console.error(`[Systems] Failed to sync ${system} config to Bot API:`, botErr.message, botErr.response?.data);
+                console.error(`[Systems] Failed to sync ${system} config to Bot API:`, botErr.message);
+                console.error('[Systems] Bot API error response:', botErr.response?.data);
                 return res.status(500).json({ success: false, error: 'Failed to sync ' + system + ' config to bot: ' + botErr.message });
             }
         }
