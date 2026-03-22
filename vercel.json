@@ -1,0 +1,9 @@
+{
+  "builds": [
+    {
+      "src": "bot/package.json",
+      "use": "@vercel/node",
+      "config": { "distDir": "bot/.next" }
+    }
+  ]
+}
