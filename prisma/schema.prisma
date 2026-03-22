@@ -1,0 +1,90 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Guild {
+  id        String   @id @default(uuid())
+  name      String
+  servers   Server[]
+}
+
+model Server {
+  id          String      @id @default(uuid())
+  guild       Guild       @relation(fields: [guildId], references: [id])
+  guildId     String
+  name        String
+  tier        String      // v1/v2/free, etc.
+  members     User[]
+  promotions  Promotion[]
+  warnings    Warning[]
+  ranks       Rank[]
+  points      Point?
+}
+
+model User {
+  id          String      @id @default(uuid())
+  discordId   String      @unique
+  username    String
+  avatarUrl   String?
+  server      Server?     @relation(fields: [serverId], references: [id])
+  serverId    String?
+  ranks       Rank[]      @relation("UserRank")
+  promotions  Promotion[]
+  warnings    Warning[]
+  points      Int         @default(0)
+  shifts      Int         @default(0)
+}
+
+model Rank {
+  id        String   @id @default(uuid())
+  name      String
+  emoji     String
+  level     Int
+  server    Server   @relation(fields: [serverId], references: [id])
+  serverId  String
+  users     User[]   @relation("UserRank")
+}
+
+model Promotion {
+  id        String   @id @default(uuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  server    Server   @relation(fields: [serverId], references: [id])
+  serverId  String
+  fromRank  String
+  toRank    String
+  reason    String
+  createdAt DateTime @default(now())
+}
+
+model Warning {
+  id        String   @id @default(uuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  server    Server   @relation(fields: [serverId], references: [id])
+  serverId  String
+  severity  String
+  reason    String
+  createdAt DateTime @default(now())
+  expiresAt DateTime?
+}
+
+model Point {
+  id       String @id @default(uuid())
+  server   Server @relation(fields: [serverId], references: [id])
+  serverId String @unique
+  total    Int    @default(0)
+}
+
+model Ticket {
+  id        String   @id @default(uuid())
+  subject   String
+  openedBy  String
+  status    String
+  createdAt DateTime @default(now())
+}

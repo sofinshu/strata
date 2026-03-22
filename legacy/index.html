@@ -1,0 +1,2114 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>STRATA — The Ultimate Discord Staff Management Bot</title>
+  <meta name="description"
+    content="Automate promotions, track shifts, manage tickets and empower your staff team with real-time data dashboards." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+
+  <div class="toast" id="toast"></div>
+
+  <!-- ── NAV ── -->
+  <nav id="mainNav">
+    <a class="nav-logo" href="#" onclick="goHome()">
+      <span class="logo-icon">🤖</span>
+      <span class="logo-text">STRATA</span>
+      <span class="logo-badge">BOT</span>
+    </a>
+    <div class="nav-links" id="navLinks">
+      <a href="#features">Features</a>
+      <a href="#systems">Systems</a>
+      <a href="#commands">Commands</a>
+      <a href="#pricing">Pricing</a>
+      <a href="https://discord.gg/smNwftEhKe" target="_blank">Support</a>
+    </div>
+    <div class="nav-actions">
+      <!-- Shown when NOT logged in -->
+      <button class="btn btn-ghost" id="navLoginBtn" onclick="loginWithDiscord()">
+        Login
+      </button>
+      <!-- Shown when logged in -->
+      <div id="navUserArea" style="display:none;align-items:center;gap:10px">
+        <img id="navUserAvatar" src="" alt="" style="width:32px;height:32px;border-radius:50%;border:2px solid rgba(108,99,255,0.5);object-fit:cover" onerror="this.style.display='none'">
+        <span id="navUsername" style="font-size:13px;font-weight:600;color:#e0e0f0"></span>
+        <button class="btn btn-ghost btn-sm" onclick="logout()" style="color:#ff4757;font-size:12px">Logout</button>
+      </div>
+      <a href="https://discord.com/api/oauth2/authorize?client_id=1473264644910088213&permissions=8&scope=bot%20applications.commands"
+        target="_blank" class="btn btn-primary">
+        Add to Server
+      </a>
+    </div>
+    <button class="nav-mobile-toggle" onclick="toggleMobileNav()">☰</button>
+  </nav>
+
+  <!-- ════════ LANDING PAGE ════════ -->
+  <div id="landingPage">
+
+    <!-- HERO -->
+    <section class="hero">
+      <div class="hero-glow"></div>
+      <div class="hero-content">
+        <div class="hero-badge">
+          <span class="badge-dot"></span>
+          271 Commands · 15 Systems · v4.0 Professional
+        </div>
+        <h1>The <span class="gradient-text">Ultimate Discord</span><br>Staff Management Bot</h1>
+        <p class="hero-desc">Automate promotions, track shifts, manage tickets, and empower your staff team — all with
+          real data and beautiful embeds.</p>
+        <div class="hero-buttons">
+          <button class="btn btn-cta" onclick="loginWithDiscord()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M20.317 4.37a19.791 19.791 0 00-4.885-1.515.074.074 0 00-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 00-5.487 0 12.64 12.64 0 00-.617-1.25.077.077 0 00-.079-.037A19.736 19.736 0 003.677 4.37a.07.07 0 00-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 00.031.057 19.9 19.9 0 005.993 3.03.078.078 0 00.084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 00-.041-.106 13.107 13.107 0 01-1.872-.892.077.077 0 01-.008-.128 10.2 10.2 0 00.372-.292.074.074 0 01.077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 01.078.01c.12.098.246.198.373.292a.077.077 0 01-.006.127 12.299 12.299 0 01-1.873.892.077.077 0 00-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 00.084.028 19.839 19.839 0 006.002-3.03.077.077 0 00.032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 00-.031-.03z" />
+            </svg>
+            Manage Your Servers
+          </button>
+          <a href="#features" class="btn btn-outline">Learn More</a>
+        </div>
+        <div class="hero-stats">
+          <div class="stat">
+            <span class="stat-num" id="stat-servers">2,400+</span>
+            <span class="stat-label">Active Servers</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat">
+            <span class="stat-num" id="stat-staff">–</span>
+            <span class="stat-label">Staff Tracked</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat">
+            <span class="stat-num" id="stat-shifts">–</span>
+            <span class="stat-label">Shifts Logged</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat">
+            <span class="stat-num" id="stat-commands">271</span>
+            <span class="stat-label">Slash Commands</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FEATURES -->
+    <section class="section" id="features">
+      <div class="section-header">
+        <div class="section-tag">Why Strata?</div>
+        <h2>Everything your staff team needs</h2>
+        <p>A complete operations suite designed for serious Discord communities.</p>
+      </div>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">📊</div>
+          <h3>Real-Time Analytics</h3>
+          <p>Live dashboards showing staff activity, shift history, warning logs, and promotion progress — all
+            per‑server.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🤖</div>
+          <h3>Auto-Promotions</h3>
+          <p>Set point thresholds, activity targets, and time-in-role requirements. Strata promotes staff automatically
+            when they qualify.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">⏱️</div>
+          <h3>Shift Tracking</h3>
+          <p>Clock in / clock out with one command. Every shift is logged with timestamps, duration, and activity score.
+          </p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🎫</div>
+          <h3>Ticket System</h3>
+          <p>Full support ticket workflow — open, assign, escalate, and close. Track resolution times and agent
+            performance.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">⚠️</div>
+          <h3>Warning System</h3>
+          <p>Issue, escalate, and revoke warnings. Triggers automatic demotions or bans based on warning thresholds you
+            define.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">💰</div>
+          <h3>Points Economy</h3>
+          <p>Reward activity with points. Staff can spend points on perks or climb the leaderboard to earn promotions
+            faster.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SYSTEMS -->
+    <section class="section section-dark" id="systems">
+      <div class="section-header">
+        <div class="section-tag">Core Systems</div>
+        <h2>Built-in staff management systems</h2>
+        <p>Fully functional, real-data systems connected to every server independently.</p>
+      </div>
+      <div class="systems-grid">
+        <!-- MANAGEMENT (V1-V2 FREE) -->
+        <div class="system-card">
+          <div class="system-header">
+            <span class="sys-icon">📊</span>
+            <div>
+              <h3>Analytics</h3>
+              <span class="sys-badge">V1 Free</span>
+            </div>
+          </div>
+          <ul class="sys-list">
+            <li>Real-time server activity metrics</li>
+            <li>Staff performance dashboards</li>
+            <li>Engagement and growth tracking</li>
+            <li>Export data reports</li>
+          </ul>
+        </div>
+        <div class="system-card">
+          <div class="system-header">
+            <span class="sys-icon">👥</span>
+            <div>
+              <h3>Staff Roster</h3>
+              <span class="sys-badge">V1 Free</span>
+            </div>
+          </div>
+          <ul class="sys-list">
+            <li>Add, remove, and manage staff members</li>
+            <li>View individual performance reports</li>
+            <li>Track activity and point history</li>
+            <li>Set staff roles and access levels</li>
+          </ul>
+        </div>
+        <div class="system-card">
+          <div class="system-header">
+            <span class="sys-icon">⏱️</span>
+            <div>
+              <h3>Shift Logs</h3>
+              <span class="sys-badge">V1 Free</span>
+            </div>
+          </div>
+          <ul class="sys-list">
+            <li>/shift start and /shift end commands</li>
+            <li>Daily and weekly shift summaries</li>
+            <li>Minimum shift hour requirements</li>
+            <li>Export shift data as reports</li>
+          </ul>
+        </div>
+        <div class="system-card">
+          <div class="system-header">
+            <span class="sys-icon">⚠️</span>
+            <div>
+              <h3>Warnings</h3>
+              <span class="sys-badge">V1 Free</span>
+            </div>
+          </div>
+          <ul class="sys-list">
+            <li>Issue, revoke, and view warnings</li>
+            <li>Auto-demote on warning threshold</li>
+            <li>Warning expiry system</li>
+            <li>Full audit log of all actions</li>
+          </ul>
+        </div>
+        <div class="system-card">
+          <div class="system-header">
+            <span class="sys-icon">🛡️</span>
+            <div>
+              <h3>Moderation</h3>
+              <span class="sys-badge">V2 Free</span>
+            </div>
+          </div>
+          <ul class="sys-list">
+            <li>Kick, ban, and mute commands</li>
+            <li>Auto-mod filters and rules</li>
+            <li>Slowmode and lock controls</li>
+            <li>Mod action logging</li>
+          </ul>
+        </div>
+        <div class="system-card">
+          <div class="system-header">
+            <span class="sys-icon">🏆</span>
+            <div>
+              <h3>Leaderboard</h3>
+              <span class="sys-badge">V2 Free</span>
+            </div>
+          </div>
+          <ul class="sys-list">
+            <li>Points-based staff rankings</li>
+            <li>Shift hour leaderboards</li>
+            <li>Achievement rankings</li>
+            <li>Customizable display options</li>
+          </ul>
+        </div>
+        
+        <!-- AUTO SYSTEMS (V3-V5 PREMIUM) -->
+        <div class="system-card">
+          <div class="system-header">
+            <span class="sys-icon">🚀</span>
+            <div>
+              <h3>Auto-Promo</h3>
+              <span class="sys-badge premium">V3 Premium</span>
+            </div>
+          </div>
+          <ul class="sys-list">
+            <li>Define promotion requirements per rank</li>
+            <li>Point, activity, and time thresholds</li>
+            <li>Automatic role assignment on qualify</li>
+            <li>Promotion announcements in your channel</li>
+          </ul>
+        </div>
+        <div class="system-card">
+          <div class="system-header">
+            <span class="sys-icon">🎫</span>
+            <div>
+              <h3>Ticket System</h3>
+              <span class="sys-badge premium">V4 Premium</span>
+            </div>
+          </div>
+          <ul class="sys-list">
+            <li>Panel-based ticket creation buttons</li>
+            <li>Assign tickets to staff members</li>
+            <li>Resolution time tracking</li>
+            <li>Ticket closure transcripts</li>
+          </ul>
+        </div>
+        <div class="system-card">
+          <div class="system-header">
+            <span class="sys-icon">🎁</span>
+            <div>
+              <h3>Giveaways</h3>
+              <span class="sys-badge premium">V4 Premium</span>
+            </div>
+          </div>
+          <ul class="sys-list">
+            <li>Create and manage giveaways</li>
+            <li>Role-based entry requirements</li>
+            <li>Automatic winner selection</li>
+            <li>Scheduled and recurring giveaways</li>
+          </ul>
+        </div>
+        <div class="system-card">
+          <div class="system-header">
+            <span class="sys-icon">📝</span>
+            <div>
+              <h3>Applications</h3>
+              <span class="sys-badge premium">V5 Premium</span>
+            </div>
+          </div>
+          <ul class="sys-list">
+            <li>Custom application forms</li>
+            <li>Application review workflow</li>
+            <li>Accept/reject with reasons</li>
+            <li>Application stats and analytics</li>
+          </ul>
+        </div>
+        <div class="system-card">
+          <div class="system-header">
+            <span class="sys-icon">🤖</span>
+            <div>
+              <h3>Auto-Mod</h3>
+              <span class="sys-badge premium">V3 Premium</span>
+            </div>
+          </div>
+          <ul class="sys-list">
+            <li>Spam and raid protection</li>
+            <li>Word filter and link blocks</li>
+            <li>Avatar and name filtering</li>
+            <li>Auto-mute on violations</li>
+          </ul>
+        </div>
+        <div class="system-card">
+          <div class="system-header">
+            <span class="sys-icon">👋</span>
+            <div>
+              <h3>Welcomer</h3>
+              <span class="sys-badge premium">V3 Premium</span>
+            </div>
+          </div>
+          <ul class="sys-list">
+            <li>Welcome messages on join</li>
+            <li>Leave messages on exit</li>
+            <li>Custom embeds and images</li>
+            <li>Role auto-assignment</li>
+          </ul>
+        </div>
+        
+        <!-- ENTERPRISE (V6-V8) -->
+        <div class="system-card">
+          <div class="system-header">
+            <span class="sys-icon">💰</span>
+            <div>
+              <h3>Economy & Shop</h3>
+              <span class="sys-badge enterprise">V6 Enterprise</span>
+            </div>
+          </div>
+          <ul class="sys-list">
+            <li>Server-wide currency system</li>
+            <li>Custom shop with items</li>
+            <li>Daily rewards and bonuses</li>
+            <li>Economy analytics</li>
+          </ul>
+        </div>
+        <div class="system-card">
+          <div class="system-header">
+            <span class="sys-icon">🤖</span>
+            <div>
+              <h3>AI Analytics</h3>
+              <span class="sys-badge enterprise">V7 Enterprise</span>
+            </div>
+          </div>
+          <ul class="sys-list">
+            <li>AI-powered predictions</li>
+            <li>Behavioral analysis</li>
+            <li>Performance forecasting</li>
+            <li>Smart recommendations</li>
+          </ul>
+        </div>
+        <div class="system-card">
+          <div class="system-header">
+            <span class="sys-icon">🌐</span>
+            <div>
+              <h3>Cross-Server</h3>
+              <span class="sys-badge enterprise">V8 Enterprise</span>
+            </div>
+          </div>
+          <ul class="sys-list">
+            <li>Network-wide staff management</li>
+            <li>Unified analytics dashboard</li>
+            <li>Cross-server economy</li>
+            <li>Shared leaderboards</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- COMMAND BROWSER -->
+    <section class="section" id="commands">
+      <div class="section-header">
+        <div class="section-tag">Commands</div>
+        <h2>271 Slash Commands. 15 Systems.</h2>
+        <p>Search and filter all available commands by name or tier.</p>
+      </div>
+      <div class="cmd-controls">
+        <div class="cmd-search-wrap">
+          <svg class="cmd-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2">
+            <circle cx="11" cy="11" r="8" />
+            <path d="m21 21-4.35-4.35" />
+          </svg>
+          <input type="text" id="cmdSearch" placeholder="Search commands..." class="cmd-input" />
+        </div>
+        <div class="tier-filters" id="tierFilters">
+          <button class="tier-btn active" data-tier="all">All</button>
+          <button class="tier-btn" data-tier="management">Management</button>
+          <button class="tier-btn" data-tier="auto">Auto Systems (V3-V5)</button>
+          <button class="tier-btn" data-tier="security">Security</button>
+          <button class="tier-btn" data-tier="utility">Utility</button>
+          <button class="tier-btn" data-tier="premium">Premium</button>
+        </div>
+      </div>
+      <div id="cmdGrid" class="cmd-grid">
+        <div class="cmd-loading">Loading commands...</div>
+      </div>
+      <div class="cmd-show-more" id="cmdShowMore" style="display:none">
+        <button class="btn btn-outline" onclick="showMoreCommands()">Show More Commands</button>
+      </div>
+  </section>
+
+  <!-- Lightweight dashboard root for quick UI surface -->
+  <div id="dashboardRoot" style="min-height:200px;margin:16px;color:var(--text-primary);"></div>
+
+  <!-- Quick UI surface scripts (enhanced Strata widgets) -->
+  <script src="src/components/StrataDashboard.js"></script>
+  <script src="src/components/StrataAutomation.js"></script>
+  <script src="src/components/StrataAchievements.js"></script>
+  <script src="src/components/StrataConfig.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Bootstrap a tiny sample surface using the new modules
+      if (window.StrataDashboard && typeof StrataDashboard.createStatCard === 'function' && document.getElementById('dashboardRoot')) {
+        const html = StrataDashboard.createStatCard({
+          icon: '👥',
+          title: 'TOTAL STAFF',
+          value: '47',
+          subtitle: 'Current server',
+          trend: { value: 6, direction: 'up', period: 'this week' },
+          sparklineData: [3,5,6,8,7,9,12]
+        });
+        document.getElementById('dashboardRoot').innerHTML = html;
+      }
+
+      if (window.StrataAutomation && typeof StrataAutomation.init === 'function') StrataAutomation.init();
+      if (window.StrataAchievements && typeof StrataAchievements.init === 'function') StrataAchievements.init();
+      if (window.StrataConfig && typeof StrataConfig.init === 'function') StrataConfig.init();
+    });
+  </script>
+
+    <!-- PRICING -->
+    <section class="section section-dark" id="pricing">
+      <div class="section-header">
+        <div class="section-tag">Pricing</div>
+        <h2>Choose your plan</h2>
+        <p>Scale your staff management with the plan that fits your server size.</p>
+      </div>
+      <div class="pricing-grid">
+        <!-- Free -->
+        <div class="pricing-card">
+          <div class="pricing-name">Free</div>
+          <div class="pricing-price">$0<span>/mo</span></div>
+          <div class="pricing-desc">For small communities getting started.</div>
+          <ul class="pricing-features">
+            <li>✓ Up to 10 staff members</li>
+            <li>✓ Basic shift tracking</li>
+            <li>✓ Warning system</li>
+            <li>✓ 50+ V1 slash commands</li>
+            <li>✓ Public leaderboard</li>
+            <li class="dim">✗ Auto-promotions</li>
+            <li class="dim">✗ Ticket system</li>
+            <li class="dim">✗ Dashboard access</li>
+          </ul>
+          <a href="https://discord.com/api/oauth2/authorize?client_id=1473264644910088213&permissions=8&scope=bot%20applications.commands"
+            target="_blank" class="btn btn-outline pricing-btn">Get Started Free</a>
+        </div>
+        <!-- Premium -->
+        <div class="pricing-card pricing-popular">
+          <div class="pricing-popular-badge">MOST POPULAR</div>
+          <div class="pricing-name">Premium</div>
+          <div class="pricing-price">$9.99<span>/mo</span></div>
+          <div class="pricing-desc">For active servers that want full automation.</div>
+          <ul class="pricing-features">
+            <li>✓ Unlimited staff members</li>
+            <li>✓ Auto-promotion system</li>
+            <li>✓ Full shift analytics</li>
+            <li>✓ Ticket system with transcripts</li>
+            <li>✓ Web dashboard access</li>
+            <li>✓ 150+ V1–V5 commands</li>
+            <li>✓ Priority Discord support</li>
+            <li class="dim">✗ Shared economy</li>
+          </ul>
+          <button class="btn btn-primary pricing-btn" onclick="loginWithDiscord()">Upgrade to Premium</button>
+        </div>
+        <!-- Enterprise -->
+        <div class="pricing-card">
+          <div class="pricing-name">Enterprise</div>
+          <div class="pricing-price">$24.99<span>/mo</span></div>
+          <div class="pricing-desc">For large networks and partnered communities.</div>
+          <ul class="pricing-features">
+            <li>✓ Everything in Premium</li>
+            <li>✓ All 271 V1–V8 commands</li>
+            <li>✓ Shared cross-server economy</li>
+            <li>✓ Custom bot branding</li>
+            <li>✓ Dedicated account manager</li>
+            <li>✓ API access</li>
+            <li>✓ SLA support guarantee</li>
+            <li>✓ Early access to new features</li>
+          </ul>
+          <button class="btn btn-outline pricing-btn" onclick="loginWithDiscord()">Go Enterprise</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA FOOTER -->
+    <section class="cta-section">
+      <h2>Ready to transform your staff team?</h2>
+      <p>Join 2,400+ servers already using Strata.</p>
+      <div class="cta-buttons">
+        <button class="btn btn-cta" onclick="loginWithDiscord()">Open Dashboard</button>
+        <a href="https://discord.gg/smNwftEhKe" target="_blank" class="btn btn-outline">Join Support Server</a>
+      </div>
+    </section>
+
+    <footer class="site-footer">
+      <div class="footer-logo">🤖 STRATA <span class="logo-badge">BOT</span></div>
+      <div class="footer-links">
+        <a href="#features">Features</a>
+        <a href="#pricing">Pricing</a>
+        <a href="https://discord.gg/smNwftEhKe" target="_blank">Discord</a>
+        <a href="https://github.com/Reyrey-mibombo/Hacka" target="_blank">GitHub</a>
+      </div>
+      <div class="footer-copy">© 2026 Strata Bot. All rights reserved.</div>
+    </footer>
+  </div>
+
+  <!-- ════════ GUILD PICKER ════════ -->
+  <div id="guildPicker" style="display:none">
+    <div class="picker-header">
+      <a class="nav-logo" onclick="goHome()" style="cursor:pointer">
+        <span class="logo-icon">🤖</span>
+        <span class="logo-text">STRATA</span>
+        <span class="logo-badge">BOT</span>
+      </a>
+      <button class="btn btn-ghost" onclick="goHome()">← Back</button>
+    </div>
+    <div class="picker-body">
+      <h2>Select a Server</h2>
+      <p>Pick the server you want to manage. Only servers where you have <strong>Manage Server</strong> permission are
+        shown.</p>
+      <div id="guildGrid" class="guild-grid"></div>
+    </div>
+  </div>
+
+  <!-- ════════ DASHBOARD ════════ -->
+  <div id="dashboard" class="dashboard">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-brand" onclick="goHome()" title="Back to home">
+        <span class="logo-icon" style="font-size:1.2rem">🤖</span>
+        <span class="logo-text" style="font-size:1rem">STRATA</span>
+      </div>
+      <div class="sidebar-server" onclick="switchPage('guildPicker')" title="Switch Server">
+        <div class="ss-avatar" id="sideAvatar">S</div>
+        <div class="ss-info">
+          <div class="ss-name" id="sideUsername">Server</div>
+          <div class="ss-role">Manager Access</div>
+        </div>
+        <span class="ss-switch">⇄</span>
+      </div>
+
+      <div class="sidebar-section">Management (V1-V2 Free)</div>
+      <div class="sidebar-item active" data-panel="overview" onclick="switchPanel('overview')">
+        <span>📊</span> Analytics <span class="v-badge">V1</span>
+      </div>
+      <div class="sidebar-item" data-panel="staff" onclick="switchPanel('staff')">
+        <span>👥</span> Staff Roster <span class="v-badge">V1</span>
+      </div>
+      <div class="sidebar-item" id="nav-shifts" data-panel="shifts" onclick="switchPanel('shifts')">
+        <span>⏱️</span> Shift Logs <span class="v-badge">V1</span>
+      </div>
+      <div class="sidebar-item" id="nav-warnings" data-panel="warnings" onclick="switchPanel('warnings')">
+        <span>⚠️</span> Warnings <span class="v-badge">V1</span>
+      </div>
+      <div class="sidebar-item" id="nav-moderation" data-panel="moderation" onclick="switchPanel('moderation')">
+        <span>🔨</span> Moderation <span class="v-badge">V2</span>
+      </div>
+      <div class="sidebar-item" id="nav-leaderboard" data-panel="leaderboard" onclick="switchPanel('leaderboard')">
+        <span>🏆</span> Leaderboard <span class="v-badge">V2</span>
+      </div>
+
+      <div class="sidebar-section">Auto Systems (V3-V5 Premium)</div>
+      <div class="sidebar-item" id="nav-promotions" data-panel="promotions" onclick="switchPanel('promotions')">
+        <span>🚀</span> Auto-Promo <span class="v-badge premium">V3</span>
+      </div>
+      <div class="sidebar-item" id="nav-tickets" data-panel="tickets" onclick="switchPanel('tickets')">
+        <span>🎫</span> Ticket System <span class="v-badge premium">V4</span>
+      </div>
+      <div class="sidebar-item" id="nav-giveaways" data-panel="giveaways" onclick="switchPanel('giveaways')">
+        <span>🎉</span> Giveaways <span class="v-badge premium">V4</span>
+      </div>
+      <div class="sidebar-item" id="nav-applications" data-panel="applications" onclick="switchPanel('applications')">
+        <span>📋</span> Applications <span class="v-badge premium">V5</span>
+      </div>
+      <div class="sidebar-item" id="nav-automod" data-panel="automod" onclick="switchPanel('automod')">
+        <span>🛡️</span> Auto-Mod <span class="v-badge premium">V3</span>
+      </div>
+      <div class="sidebar-item" id="nav-antispam" data-panel="antispam" onclick="switchPanel('antispam')">
+        <span>🛡️</span> Anti-Spam <span class="v-badge premium">V5</span>
+      </div>
+      <div class="sidebar-item" id="nav-welcome" data-panel="welcome" onclick="switchPanel('welcome')">
+        <span>👋</span> Welcomer <span class="v-badge premium">V3</span>
+      </div>
+      <div class="sidebar-item" id="nav-autorole" data-panel="autorole" onclick="switchPanel('autorole')">
+        <span>🎭</span> Auto-Role <span class="v-badge premium">V4</span>
+      </div>
+      <div class="sidebar-item" id="nav-leveling" data-panel="leveling" onclick="switchPanel('leveling')">
+        <span>⭐</span> Leveling & XP <span class="v-badge premium">V4</span>
+      </div>
+      <div class="sidebar-item" id="nav-logging" data-panel="logging" onclick="switchPanel('logging')">
+        <span>📜</span> Server Logging <span class="v-badge premium">V5</span>
+      </div>
+
+      <div class="sidebar-section">Enterprise (V6-V8)</div>
+      <div class="sidebar-item" id="nav-economy" data-panel="economy" onclick="switchPanel('economy')">
+        <span>💰</span> Economy & Shop <span class="v-badge enterprise">V6</span>
+      </div>
+      <div class="sidebar-item" id="nav-staffrewards" data-panel="staffrewards" onclick="switchPanel('staffrewards')">
+        <span>🏆</span> Staff Rewards <span class="v-badge enterprise">V7</span>
+      </div>
+      <div class="sidebar-item" id="nav-alerts" data-panel="alerts" onclick="switchPanel('alerts')">
+        <span>🔔</span> Activity Alerts <span class="v-badge premium">V5</span>
+      </div>
+      <div class="sidebar-item" id="nav-branding" data-panel="branding" onclick="switchPanel('branding')">
+        <span>✨</span> Custom Branding <span class="v-badge enterprise">V8</span>
+      </div>
+      <div class="sidebar-item" id="nav-activitylog" data-panel="activitylog" onclick="switchPanel('activitylog')">
+        <span>📖</span> Activity Log <span class="v-badge enterprise">V6</span>
+      </div>
+      <div class="sidebar-item" id="nav-ticketlogs" data-panel="ticketlogs" onclick="switchPanel('ticketlogs')">
+        <span>🎫</span> Ticket Logs <span class="v-badge enterprise">V6</span>
+      </div>
+
+      <div class="sidebar-section">Insight & Data (Stage 4)</div>
+      <div class="sidebar-item" id="nav-analytics-adv" data-panel="analytics-adv" onclick="switchPanel('analytics-adv')">
+        <span>📈</span> Advanced Analytics <span class="v-badge">V4</span>
+      </div>
+      <div class="sidebar-item" id="nav-dataexport" data-panel="dataexport" onclick="switchPanel('dataexport')">
+        <span>📥</span> Data Export <span class="v-badge">V4</span>
+      </div>
+
+      <div class="sidebar-section">System</div>
+      <div class="sidebar-item" id="nav-settings" data-panel="settings" onclick="switchPanel('settings')">
+        <span>⚙️</span> Settings
+      </div>
+      <div class="sidebar-item" id="nav-subscription" data-panel="subscription" onclick="switchPanel('subscription')">
+        <span>💎</span> Subscription Plan
+      </div>
+    </aside>
+
+    <main class="dash-content">
+      <div class="dash-topbar">
+        <div>
+          <div class="dash-title" id="dashTitle">Analytics</div>
+          <div class="dash-sub" id="dashSub">Real-time overview of your server.</div>
+        </div>
+        <div style="display:flex;gap:10px">
+          <button class="btn btn-outline btn-sm" id="btnDemoData" onclick="toggleDemoData()">💡 View Sample Data</button>
+          <button class="btn btn-ghost btn-sm" onclick="loadDashboardData()">↻ Refresh</button>
+        </div>
+      </div>
+
+
+
+      <!-- OVERVIEW -->
+      <div class="dash-panel" id="panel-overview">
+        <div class="dash-kpis">
+          <div class="kpi">
+            <div class="kpi-label">Staff Members</div>
+            <div class="kpi-value accent" id="ovStaff">–</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-label">Completed Shifts</div>
+            <div class="kpi-value green" id="ovShifts">–</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-label">Active Warnings</div>
+            <div class="kpi-value red" id="ovWarnings">–</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-label">Total Points</div>
+            <div class="kpi-value purple" id="ovPoints">–</div>
+          </div>
+        </div>
+        <div class="dash-card chart-card">
+          <div class="card-title">Staff Activity — Last 7 Days</div>
+          <div class="chart-wrap"><canvas id="activityChart"></canvas></div>
+        </div>
+      </div>
+
+      <!-- STAFF -->
+      <div class="dash-panel" id="panel-staff" style="display:none">
+        <div class="dash-card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+            <div class="card-title" style="margin:0">Staff Roster</div>
+            <button class="btn btn-primary btn-sm" onclick="openAddStaffModal()">+ Add Staff</button>
+          </div>
+          <div class="table-wrap">
+            <table class="data-table" id="staffTable">
+              <thead>
+                <tr>
+                  <th>Member</th>
+                  <th>Rank</th>
+                  <th>Points</th>
+                  <th>Shifts</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="staffBody">
+                <tr>
+                  <td colspan="6" class="table-empty">Loading...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- SHIFTS -->
+      <div class="dash-panel" id="panel-shifts" style="display:none">
+        <div class="dash-card">
+          <div class="card-title">Shift Logs</div>
+          <div class="table-wrap">
+            <table class="data-table" id="shiftsTable">
+              <thead>
+                <tr>
+                  <th>Staff Member</th>
+                  <th>Start</th>
+                  <th>End</th>
+                  <th>Duration</th>
+                  <th>Points</th>
+                </tr>
+              </thead>
+              <tbody id="shiftsBody">
+                <tr>
+                  <td colspan="5" class="table-empty">Loading...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- WARNINGS -->
+      <div class="dash-panel" id="panel-warnings" style="display:none">
+        <div class="dash-card">
+          <div class="card-title">Warning Log</div>
+          <div class="table-wrap">
+            <table class="data-table" id="warningsTable">
+              <thead>
+                <tr>
+                  <th>Member</th>
+                  <th>Reason</th>
+                  <th>Issued By</th>
+                  <th>Date</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="warningsBody">
+                <tr>
+                  <td colspan="5" class="table-empty">Loading...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- GIVEAWAY SYSTEM -->
+      <div class="dash-panel" id="panel-giveaways" style="display:none">
+        <div class="sys-module-header">
+          <div>
+            <div class="card-title" style="margin:0">🎉 Giveaway System</div>
+            <div class="card-desc" style="margin:6px 0 0">Create prizes, set winners, and watch the entries roll in.</div>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="showCreateGiveaway()">+ New Giveaway</button>
+        </div>
+
+        <div class="sys-modules">
+          <div class="sys-module">
+            <div class="card-title" style="font-size:16px;margin-bottom:15px">Active Giveaways</div>
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Prize</th>
+                    <th>Winners</th>
+                    <th>Participants</th>
+                    <th>End Time</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="activeGiveawaysBody">
+                  <tr><td colspan="5" class="table-empty">Loading active giveaways...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="sys-module">
+            <div class="card-title" style="font-size:16px;margin-bottom:15px">Past Giveaways</div>
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Prize</th>
+                    <th>Winners</th>
+                    <th>Total Entries</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                  </tr>
+                </thead>
+                <tbody id="pastGiveawaysBody">
+                  <tr><td colspan="5" class="table-empty">No past giveaways found.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MODERATION -->
+      <div class="dash-panel" id="panel-moderation" style="display:none">
+        <div class="dash-card">
+          <div class="card-title" style="display:flex;align-items:center;gap:10px">
+            🔨 Moderation Actions
+            <button class="btn btn-secondary btn-sm" onclick="loadModerationActions(currentGuild?.id)">🔄 Refresh</button>
+          </div>
+          <div class="table-filters" style="display:flex; gap:10px; margin-bottom:15px;">
+            <select id="modActionFilter" class="form-input" style="width:150px" onchange="loadModerationActions(currentGuild?.id)">
+              <option value="">All Actions</option>
+              <option value="ban">Bans</option>
+              <option value="kick">Kicks</option>
+              <option value="timeout">Timeouts</option>
+              <option value="warn">Warnings</option>
+            </select>
+          </div>
+          <div class="table-wrap">
+            <table class="data-table" id="moderationTable">
+              <thead>
+                <tr>
+                  <th>Action</th>
+                  <th>Target</th>
+                  <th>Moderator</th>
+                  <th>Reason</th>
+                  <th>Date</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="moderationBody">
+                <tr>
+                  <td colspan="6" class="table-empty">No moderation actions found.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="dash-card" style="margin-top:20px">
+          <div class="card-title">Quick Actions</div>
+          <div style="display:flex; gap:15px; flex-wrap:wrap;">
+            <button class="btn btn-danger" onclick="showModActionModal('ban')">⛔ Ban User</button>
+            <button class="btn btn-warning" onclick="showModActionModal('kick')">👢 Kick User</button>
+            <button class="btn btn-secondary" onclick="showModActionModal('warn')">⚠️ Warn User</button>
+            <button class="btn btn-info" onclick="showModActionModal('timeout')">🔇 Timeout User</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- LEADERBOARD -->
+      <div class="dash-panel" id="panel-leaderboard" style="display:none">
+        <div class="dash-card">
+          <div class="card-title">🏆 Staff Leaderboard</div>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Rank</th>
+                  <th>Staff Member</th>
+                  <th>Points</th>
+                  <th>Shifts</th>
+                  <th>Activity</th>
+                </tr>
+              </thead>
+              <tbody id="leaderboardBody">
+                <tr>
+                  <td colspan="5" class="table-empty">Loading...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+
+
+      <!-- PROMO HISTORY -->
+      <div class="dash-panel" id="panel-promohistory" style="display:none">
+        <div class="dash-card">
+          <div class="card-title">🚀 Promotion & Demotion History</div>
+          <div class="table-filters" style="margin-bottom:15px;">
+            <button class="btn btn-secondary" onclick="loadPromoHistory(currentGuild?.id)">🔄 Refresh Log</button>
+          </div>
+          <div class="table-wrap" style="margin-bottom:20px;">
+            <h3 style="color:#fff;font-size:14px;margin-bottom:10px">Recent Rank Changes</h3>
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Time</th>
+                  <th>User ID</th>
+                  <th>Event</th>
+                  <th>Details</th>
+                </tr>
+              </thead>
+              <tbody id="promohistoryBody">
+                <tr>
+                  <td colspan="4" class="table-empty">Loading history...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="table-wrap">
+            <h3 style="color:#fff;font-size:14px;margin-bottom:10px">Recently Promoted Staff</h3>
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Staff Member</th>
+                  <th>Current Rank</th>
+                  <th>Points</th>
+                  <th>Last Promoted</th>
+                </tr>
+              </thead>
+              <tbody id="recentpromotionsBody">
+                <tr>
+                  <td colspan="4" class="table-empty">Loading staff...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- APPLICATIONS -->
+      <div class="dash-panel" id="panel-applications" style="display:none">
+        <div class="dash-card">
+          <div class="card-title" style="display:flex;align-items:center;gap:10px">📋 Staff Applications <span
+              class="premium-badge">PREMIUM</span></div>
+          <p style="color:#9b9bb3;font-size:14px;margin-bottom:20px;">Allow members to apply for staff via a button,
+            sending questions directly into their DMs. (Premium / Tier 2+ Required)</p>
+          <div id="appTierLock"
+            style="display:none;padding:40px;text-align:center;background:rgba(255,255,255,0.02);border-radius:10px;border:1px dashed #5c5c78;margin-bottom:20px">
+            <div style="font-size:40px;margin-bottom:10px">⭐</div>
+            <h3 style="color:#fff;margin-bottom:10px">Premium Feature</h3>
+            <p style="color:#9b9bb3">Your server must have an active license to use Custom Applications.</p>
+          </div>
+          <div class="settings-form" id="appUIBox">
+            <div class="form-row">
+              <label>Enable Application System</label>
+              <div class="toggle"><input type="checkbox" id="settingAppEnabled"><span class="slider"></span></div>
+            </div>
+            <div class="form-row">
+              <label>Embed Panel Title</label>
+              <input type="text" id="settingAppTitle" placeholder="e.g. Moderator Application" class="form-input">
+            </div>
+            <div class="form-row">
+              <label>Panel Send Channel ID <span style="font-size:12px;color:#5c5c78;font-weight:400">(Where the "Apply"
+                  button is posted)</span></label>
+              <select id="settingAppChannel" class="form-input">
+                <option value="">Loading channels...</option>
+              </select>
+            </div>
+            <div class="form-row">
+              <label>Applications Review Channel ID <span style="font-size:12px;color:#5c5c78;font-weight:400">(Where
+                  completed forms are sent)</span></label>
+              <select id="settingAppReview" class="form-input">
+                <option value="">Loading channels...</option>
+              </select>
+            </div>
+            <div class="form-row">
+              <label>Reviewer Role ID <span style="font-size:12px;color:#5c5c78;font-weight:400">(Who gets pinged for
+                  new apps)</span></label>
+              <input type="text" id="settingAppRole" placeholder="Role ID" class="form-input">
+            </div>
+            <div class="form-row">
+              <label>Custom Questions</label>
+              <div id="appQuestionsList" style="display:flex;flex-direction:column;gap:10px;margin-bottom:10px"></div>
+              <button class="btn btn-secondary" style="width:fit-content" onclick="addAppQuestion()">+ Add
+                Question</button>
+            </div>
+            <button class="btn btn-primary" onclick="saveApps()"
+              style="margin-top:20px">Save Application System</button>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- SETTINGS -->
+      <div class="dash-panel" id="panel-settings" style="display:none">
+        <div class="dash-card">
+          <div class="card-title">Server Configuration</div>
+          <div class="settings-form" id="settingsForm">
+            <div class="form-row">
+              <label>Mod / Moderation Log Channel ID</label>
+              <select id="settingModChannel" class="form-input">
+                <option value="">Loading channels...</option>
+              </select>
+            </div>
+            <div class="form-row">
+              <label>Staff Channel ID <span
+                  style="color:#5c5c78;font-weight:400;text-transform:none;letter-spacing:0">(where staff commands are
+                  posted)</span></label>
+              <select id="settingStaffChannel" class="form-input">
+                <option value="">Loading channels...</option>
+              </select>
+            </div>
+            <div class="form-row">
+              <label>General Log Channel ID</label>
+              <select id="settingLogChannel" class="form-input">
+                <option value="">Loading channels...</option>
+              </select>
+            </div>
+            <div class="form-row">
+              <label>Warning Threshold (auto-demote)</label>
+              <input type="number" id="settingWarnThreshold" placeholder="e.g. 3" min="1" max="10" class="form-input"
+                style="max-width:160px">
+            </div>
+            <div class="form-row">
+              <label>Minimum Shift Duration (minutes)</label>
+              <input type="number" id="settingMinShift" placeholder="e.g. 30" min="5" max="480" class="form-input"
+                style="max-width:160px">
+            </div>
+            <div class="form-row" style="display:flex;align-items:center;gap:14px">
+              <label style="margin:0">Auto-Promotion System</label>
+              <label class="toggle"><input type="checkbox" id="settingAutoPromo"><span
+                  class="toggle-slider"></span></label>
+            </div>
+            <button class="btn btn-primary" onclick="saveSettings()" style="margin-top:20px">Save Settings</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- AUTO PROMO -->
+      <div class="dash-panel" id="panel-promotions" style="display:none">
+        <div class="dash-card">
+          <div class="card-title">🚀 Auto-Promotion System</div>
+          <div class="sys-module-header">
+            <div>
+              <div class="card-desc" style="margin:6px 0 0">Configure automatic promotions. Staff are promoted when they meet all requirements for a rank.</div>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="saveAutoPromo()">Save Settings</button>
+          </div>
+          <div class="form-row" style="margin-bottom:20px;max-width:400px">
+            <label>Promotion Announcement Channel</label>
+            <select id="settingPromoChannel" class="form-input">
+              <option value="">Loading channels...</option>
+            </select>
+          </div>
+          <div id="promoRankList" class="promo-list">
+            <div class="table-empty">Loading promotion requirements...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AUTO MODERATION -->
+      <div class="dash-panel" id="panel-automod" style="display:none">
+        <div class="sys-module-header">
+          <div>
+            <div class="card-title" style="margin:0">🛡️ Auto-Moderation</div>
+            <div class="card-desc" style="margin:6px 0 0">Automatically moderate your server. Each rule is enforced in
+              real-time by the bot.</div>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="saveAutoMod()">Save Changes</button>
+        </div>
+        <div class="sys-modules">
+          <div class="sys-module">
+            <div class="module-row">
+              <div>
+                <div class="module-title">Block Profanity</div>
+                <div class="module-desc">Delete messages containing profanity and offensive words.</div>
+              </div>
+              <label class="toggle"><input type="checkbox" id="am-profanity"><span class="toggle-slider"></span></label>
+            </div>
+            <div class="module-extra" id="am-profanity-opts" style="display:none">
+              <div class="form-row" style="margin-top:12px">
+                <label>Custom Blocked Words (comma-separated)</label>
+                <input type="text" id="am-banned-words" class="form-input" placeholder="e.g. word1, word2, word3">
+              </div>
+            </div>
+          </div>
+          <div class="sys-module">
+            <div class="module-row">
+              <div>
+                <div class="module-title">Block External Links</div>
+                <div class="module-desc">Delete messages that contain external URLs (not whitelisted).</div>
+              </div>
+              <label class="toggle"><input type="checkbox" id="am-links"><span class="toggle-slider"></span></label>
+            </div>
+            <div class="module-extra" id="am-links-opts" style="display:none">
+              <div class="form-row" style="margin-top:12px">
+                <label>Allowed Domains (comma-separated)</label>
+                <input type="text" id="am-allowed-domains" class="form-input"
+                  placeholder="e.g. discord.com, youtube.com">
+              </div>
+            </div>
+          </div>
+          <div class="sys-module">
+            <div class="module-row">
+              <div>
+                <div class="module-title">Anti-Mention Spam</div>
+                <div class="module-desc">Timeout users who mass-mention others in a single message.</div>
+              </div>
+              <label class="toggle"><input type="checkbox" id="am-mentions"><span class="toggle-slider"></span></label>
+            </div>
+            <div class="module-extra" id="am-mentions-opts" style="display:none">
+              <div class="form-row" style="margin-top:12px">
+                <label>Max Mentions Per Message</label>
+                <input type="number" id="am-max-mentions" class="form-input" placeholder="e.g. 5" min="2" max="20"
+                  style="max-width:160px">
+              </div>
+            </div>
+          </div>
+          <div class="sys-module">
+            <div class="module-row">
+              <div>
+                <div class="module-title">Block Discord Invites</div>
+                <div class="module-desc">Auto-delete messages containing Discord invite links from other servers.</div>
+              </div>
+              <label class="toggle"><input type="checkbox" id="am-invites"><span class="toggle-slider"></span></label>
+            </div>
+          </div>
+          <div class="sys-module">
+            <div class="module-row">
+              <div>
+                <div class="module-title">Auto-Timeout on Violation</div>
+                <div class="module-desc">Temporarily timeout members who repeatedly violate rules.</div>
+              </div>
+              <label class="toggle"><input type="checkbox" id="am-timeout"><span class="toggle-slider"></span></label>
+            </div>
+            <div class="module-extra" id="am-timeout-opts" style="display:none">
+              <div class="form-row" style="margin-top:12px">
+                <label>Timeout Duration (minutes)</label>
+                <input type="number" id="am-timeout-dur" class="form-input" placeholder="e.g. 10" min="1" max="1440"
+                  style="max-width:160px">
+              </div>
+            </div>
+          </div>
+          <div class="sys-module">
+            <div class="module-row">
+              <div>
+                <div class="module-title">Log Violations</div>
+                <div class="module-desc">Send a message to a log channel whenever a rule is violated.</div>
+              </div>
+              <label class="toggle"><input type="checkbox" id="am-log"><span class="toggle-slider"></span></label>
+            </div>
+            <div class="module-extra" id="am-log-opts" style="display:none">
+              <div class="form-row" style="margin-top:12px">
+                <label>Log Channel ID</label>
+                <select id="am-log-channel" class="form-input">
+                  <option value="">Loading channels...</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- LEVELING & XP -->
+      <div class="dash-panel" id="panel-leveling" style="display:none">
+        <div class="sys-module-header">
+          <div>
+            <div class="card-title" style="margin:0">⭐ Leveling & XP System</div>
+            <div class="card-desc" style="margin:6px 0 0">Reward active members with XP and levels. Configure rewards and notifications.</div>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="saveLeveling()">Save Changes</button>
+        </div>
+        <div class="sys-modules">
+          <div class="sys-module">
+            <div class="module-row">
+              <div>
+                <div class="module-title">Enable Leveling System</div>
+                <div class="module-desc">Enable tracking and rewarding experience points for members.</div>
+              </div>
+              <label class="toggle"><input type="checkbox" id="lvl-enabled"><span class="toggle-slider"></span></label>
+            </div>
+          </div>
+          
+          <div class="sys-module">
+            <div class="module-title" style="font-size:1rem;margin-bottom:15px">XP Rewards Configuration</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+              <div class="form-row">
+                <label>Minimum XP per Message</label>
+                <input type="number" id="lvl-min-xp" class="form-input" placeholder="15" min="1">
+              </div>
+              <div class="form-row">
+                <label>Maximum XP per Message</label>
+                <input type="number" id="lvl-max-xp" class="form-input" placeholder="25" min="1">
+              </div>
+            </div>
+            <div class="form-row" style="margin-top:16px">
+              <label>XP Cooldown (Seconds)</label>
+              <input type="number" id="lvl-cooldown" class="form-input" placeholder="60" min="0" style="max-width:200px">
+              <div class="card-desc" style="margin-top:4px">Wait time between awarding XP for messages.</div>
+            </div>
+          </div>
+
+          <div class="sys-module">
+            <div class="module-title" style="font-size:1rem;margin-bottom:15px">Level-Up Notifications</div>
+            <div class="form-row">
+              <label>Notification Channel ID</label>
+              <select id="lvl-channel" class="form-input">
+                <option value="">Current Channel (default)</option>
+                <option value="">Loading channels...</option>
+              </select>
+            </div>
+            <div class="form-row" style="margin-top:16px">
+              <label>Level-Up Message <span style="color:#5c5c78;font-weight:400;text-transform:none">(use {user}, {level}, {old_level})</span></label>
+              <textarea id="lvl-message" class="form-input" rows="3" placeholder="GG {user}, you just leveled up to **Level {level}**!"></textarea>
+            </div>
+            <div class="module-row" style="margin-top:16px">
+              <div>
+                <div class="module-title" style="font-size:0.95rem">DM Level-Up Notification</div>
+                <div class="module-desc">Also notify the member via private DM.</div>
+              </div>
+              <label class="toggle"><input type="checkbox" id="lvl-dm"><span class="toggle-slider"></span></label>
+            </div>
+          </div>
+
+          <div class="sys-module">
+            <div class="module-title" style="font-size:1rem;margin-bottom:15px">Restrictions & Exclusions</div>
+            <div class="form-row">
+              <label>Excluded Channels <span style="color:#5c5c78;font-weight:400;text-transform:none">(comma separated IDs)</span></label>
+              <textarea id="lvl-ex-channels" class="form-input" rows="2" placeholder="ID1, ID2, ..."></textarea>
+            </div>
+            <div class="form-row" style="margin-top:16px">
+              <label>Excluded Roles <span style="color:#5c5c78;font-weight:400;text-transform:none">(comma separated IDs)</span></label>
+              <textarea id="lvl-ex-roles" class="form-input" rows="2" placeholder="ID1, ID2, ..."></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- WELCOME SYSTEM -->
+      <div class="dash-panel" id="panel-welcome" style="display:none">
+        <div class="sys-module-header">
+          <div>
+            <div class="card-title" style="margin:0">👋 Welcome System</div>
+            <div class="card-desc" style="margin:6px 0 0">Send a customized welcome message when a new member joins your
+              server.</div>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="saveWelcome()">Save Changes</button>
+        </div>
+        <div class="sys-modules">
+          <div class="sys-module">
+            <div class="module-row">
+              <div>
+                <div class="module-title">Enable Welcome Messages</div>
+                <div class="module-desc">Send a message to a channel when a new member joins.</div>
+              </div>
+              <label class="toggle"><input type="checkbox" id="wlc-enabled"><span class="toggle-slider"></span></label>
+            </div>
+          </div>
+          <div class="sys-module">
+            <div class="form-row">
+              <label>Welcome Channel ID</label>
+              <select id="wlc-channel" class="form-input">
+                <option value="">Loading channels...</option>
+              </select>
+            </div>
+            <div class="form-row" style="margin-top:16px">
+              <label>Welcome Message <span
+                  style="color:#5c5c78;font-weight:400;text-transform:none;letter-spacing:0">(use {user} for mention,
+                  {server} for name, {count} for member count)</span></label>
+              <textarea id="wlc-message" class="form-input" rows="4"
+                placeholder="Welcome {user} to {server}! You are member #{count}."></textarea>
+            </div>
+          </div>
+          <div class="sys-module">
+            <div class="module-row">
+              <div>
+                <div class="module-title">Welcome DM</div>
+                <div class="module-desc">Also send a private DM to the new member when they join.</div>
+              </div>
+              <label class="toggle"><input type="checkbox" id="wlc-dm"><span class="toggle-slider"></span></label>
+            </div>
+          </div>
+          <div class="sys-module">
+            <div class="form-row">
+              <label>DM Message <span
+                  style="color:#5c5c78;font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></label>
+              <textarea id="wlc-dm-message" class="form-input" rows="3"
+                placeholder="Thanks for joining {server}! Read the rules and enjoy your stay."></textarea>
+            </div>
+          </div>
+
+          <hr style="border:0;border-top:1px solid rgba(255,255,255,0.05);margin:20px 0">
+
+          <!-- GOODBYE SYSTEM -->
+          <div class="sys-module-header" style="padding-top:0">
+            <div>
+              <div class="card-title" style="margin:0;font-size:1.1rem">👋 Goodbye System (Leave Messages)</div>
+              <div class="card-desc" style="margin:6px 0 0">Send a message when a member leaves your server.</div>
+            </div>
+          </div>
+
+          <div class="sys-module">
+            <div class="module-row">
+              <div>
+                <div class="module-title">Enable Goodbye Messages</div>
+                <div class="module-desc">Send a message to a channel when a member leaves.</div>
+              </div>
+              <label class="toggle"><input type="checkbox" id="gb-enabled"><span class="toggle-slider"></span></label>
+            </div>
+          </div>
+          <div class="sys-module">
+            <div class="form-row">
+              <label>Goodbye Channel ID</label>
+              <select id="gb-channel" class="form-input">
+                <option value="">Loading channels...</option>
+              </select>
+            </div>
+            <div class="form-row" style="margin-top:16px">
+              <label>Goodbye Message <span
+                  style="color:#5c5c78;font-weight:400;text-transform:none;letter-spacing:0">(use {user} for name,
+                  {server} for name, {count} for member count)</span></label>
+              <textarea id="gb-message" class="form-input" rows="4"
+                placeholder="{user} has left {server}. We now have {count} members."></textarea>
+            </div>
+          </div>
+          <div class="sys-module">
+            <div class="module-row">
+              <div>
+                <div class="module-title">Goodbye DM</div>
+                <div class="module-desc">Also send a private DM to the member when they leave (if possible).</div>
+              </div>
+              <label class="toggle"><input type="checkbox" id="gb-dm"><span class="toggle-slider"></span></label>
+            </div>
+          </div>
+          <div class="sys-module">
+            <div class="form-row">
+              <label>DM Message <span
+                  style="color:#5c5c78;font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></label>
+              <textarea id="gb-dm-message" class="form-input" rows="3"
+                placeholder="We're sorry to see you go! Thanks for being part of {server}."></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AUTO ROLE -->
+      <div class="dash-panel" id="panel-autorole" style="display:none">
+        <div class="sys-module-header">
+          <div>
+            <div class="card-title" style="margin:0">🎭 Auto-Role</div>
+            <div class="card-desc" style="margin:6px 0 0">Automatically assign roles to members when they join or
+              verify.</div>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="saveAutoRole()">Save Changes</button>
+        </div>
+        <div class="sys-modules">
+          <div class="sys-module">
+            <div class="module-row">
+              <div>
+                <div class="module-title">Auto-Role on Join</div>
+                <div class="module-desc">Assign a role automatically when a new member joins the server.</div>
+              </div>
+              <label class="toggle"><input type="checkbox" id="ar-join"><span class="toggle-slider"></span></label>
+            </div>
+            <div class="form-row" style="margin-top:12px">
+              <label>Role ID to Assign on Join</label>
+              <input type="text" id="ar-join-role" class="form-input" placeholder="e.g. 123456789012345678">
+            </div>
+          </div>
+          <div class="sys-module">
+            <div class="module-row">
+              <div>
+                <div class="module-title">Bot Auto-Role</div>
+                <div class="module-desc">Assign a specific role to bots that join the server.</div>
+              </div>
+              <label class="toggle"><input type="checkbox" id="ar-bot"><span class="toggle-slider"></span></label>
+            </div>
+            <div class="form-row" style="margin-top:12px">
+              <label>Role ID for Bots</label>
+              <input type="text" id="ar-bot-role" class="form-input" placeholder="e.g. 123456789012345678">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SERVER LOGGING -->
+      <div class="dash-panel" id="panel-logging" style="display:none">
+        <div class="sys-module-header">
+          <div>
+            <div class="card-title" style="margin:0">📋 Server Logging</div>
+            <div class="card-desc" style="margin:6px 0 0">Log server events to dedicated channels. Enable each log type
+              you want to track.</div>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="saveLogging()">Save Changes</button>
+        </div>
+        <div class="sys-modules">
+          <div class="sys-module">
+            <div class="module-row">
+              <div>
+                <div class="module-title">Member Join/Leave Log</div>
+                <div class="module-desc">Log when members join or leave the server.</div>
+              </div>
+              <label class="toggle"><input type="checkbox" id="log-members"><span class="toggle-slider"></span></label>
+            </div>
+            <div class="form-row" style="margin-top:12px"><label>Log Channel</label><select
+                id="log-members-ch" class="form-input"><option value="">Loading channels...</option></select></div>
+          </div>
+          <div class="sys-module">
+            <div class="module-row">
+              <div>
+                <div class="module-title">Message Delete/Edit Log</div>
+                <div class="module-desc">Log deleted and edited messages.</div>
+              </div>
+              <label class="toggle"><input type="checkbox" id="log-messages"><span class="toggle-slider"></span></label>
+            </div>
+            <div class="form-row" style="margin-top:12px"><label>Log Channel</label><select
+                id="log-messages-ch" class="form-input"><option value="">Loading channels...</option></select></div>
+          </div>
+          <div class="sys-module">
+            <div class="module-row">
+              <div>
+                <div class="module-title">Moderation Action Log</div>
+                <div class="module-desc">Log bans, kicks, mutes, timeouts, and warnings.</div>
+              </div>
+              <label class="toggle"><input type="checkbox" id="log-mod"><span class="toggle-slider"></span></label>
+            </div>
+            <div class="form-row" style="margin-top:12px"><label>Log Channel</label><select
+                id="log-mod-ch" class="form-input"><option value="">Loading channels...</option></select></div>
+          </div>
+          <div class="sys-module">
+            <div class="module-row">
+              <div>
+                <div class="module-title">Role Change Log</div>
+                <div class="module-desc">Log when member roles are added or removed.</div>
+              </div>
+              <label class="toggle"><input type="checkbox" id="log-roles"><span class="toggle-slider"></span></label>
+            </div>
+            <div class="form-row" style="margin-top:12px"><label>Log Channel</label><select
+                id="log-roles-ch" class="form-input"><option value="">Loading channels...</option></select></div>
+          </div>
+          <div class="sys-module">
+            <div class="module-row">
+              <div>
+                <div class="module-title">Voice State Log</div>
+                <div class="module-desc">Log when members join, leave, or move voice channels.</div>
+              </div>
+              <label class="toggle"><input type="checkbox" id="log-voice"><span class="toggle-slider"></span></label>
+            </div>
+            <div class="form-row" style="margin-top:12px"><label>Log Channel</label><select
+                id="log-voice-ch" class="form-input"><option value="">Loading channels...</option></select></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ANTI SPAM -->
+      <div class="dash-panel" id="panel-antispam" style="display:none">
+        <div class="sys-module-header">
+          <div>
+            <div class="card-title" style="margin:0">🚫 Anti-Spam</div>
+            <div class="card-desc" style="margin:6px 0 0">Prevent spam in your server. Configure rate limits and
+              punishments.</div>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="saveAntiSpam()">Save Changes</button>
+        </div>
+        <div class="sys-modules">
+          <div class="sys-module">
+            <div class="module-row">
+              <div>
+                <div class="module-title">Enable Anti-Spam</div>
+                <div class="module-desc">Detect and act on spam messages.</div>
+              </div>
+              <label class="toggle"><input type="checkbox" id="as-enabled"><span class="toggle-slider"></span></label>
+            </div>
+          </div>
+          <div class="sys-module">
+            <div class="form-row">
+              <label>Max Messages Per 5 Seconds</label>
+              <input type="number" id="as-rate" class="form-input" placeholder="e.g. 5" min="2" max="20"
+                style="max-width:160px">
+            </div>
+            <div class="form-row" style="margin-top:14px">
+              <label>Punishment</label>
+              <select id="as-action" class="form-input" style="max-width:220px">
+                <option value="delete">Delete Messages Only</option>
+                <option value="timeout">Delete + Timeout (5 min)</option>
+                <option value="kick">Delete + Kick</option>
+                <option value="ban">Delete + Ban</option>
+              </select>
+            </div>
+          </div>
+          <div class="sys-module">
+            <div class="module-row">
+              <div>
+                <div class="module-title">Ignore Staff Members</div>
+                <div class="module-desc">Don't apply anti-spam rules to registered staff members.</div>
+              </div>
+              <label class="toggle"><input type="checkbox" id="as-ignore-staff"><span
+                  class="toggle-slider"></span></label>
+            </div>
+          </div>
+          <div class="sys-module">
+            <div class="module-row">
+              <div>
+                <div class="module-title">Duplicate Message Filter</div>
+                <div class="module-desc">Block users from sending the same message repeatedly.</div>
+              </div>
+              <label class="toggle"><input type="checkbox" id="as-dupes"><span class="toggle-slider"></span></label>
+            </div>
+          </div>
+          <div class="sys-module">
+            <div class="form-row">
+              <select id="as-log-ch" class="form-input">
+                <option value="">No logging (optional)</option>
+                <option value="">Loading channels...</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ACTIVITY ALERTS -->
+      <div class="dash-panel" id="panel-alerts" style="display:none">
+        <div class="sys-module-header">
+          <div>
+            <div class="card-title" style="margin:0">🔔 Activity Alerts</div>
+            <div class="card-desc" style="margin:6px 0 0">Automatically ping staff roles when specific thresholds are met (e.g. low activity, warning spikes).</div>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="saveAlerts()">Save Changes</button>
+        </div>
+        <div class="sys-modules">
+          <div class="sys-module">
+            <div class="module-row">
+              <div>
+                <div class="module-title">Enable Alerts</div>
+                <div class="module-desc">Activate the automated alert system.</div>
+              </div>
+              <label class="toggle"><input type="checkbox" id="al-enabled"><span class="toggle-slider"></span></label>
+            </div>
+            <div class="form-row" style="margin-top:12px">
+              <label>Alert Notification Channel</label>
+              <select id="settingAlertChannel" class="form-input">
+                <option value="">Select a channel...</option>
+              </select>
+            </div>
+          </div>
+          <div class="sys-module">
+            <div class="module-title" style="font-size:1rem;margin-bottom:15px">Alert Thresholds</div>
+            <div class="form-row">
+              <label>Low Activity Trigger <span style="font-size:12px;color:#5c5c78">(pings if staff activity drops below X%)</span></label>
+              <input type="number" id="al-threshold-low" class="form-input" placeholder="20" min="1" max="100">
+            </div>
+            <div class="form-row" style="margin-top:14px">
+              <label>Warning Surge Trigger <span style="font-size:12px;color:#5c5c78">(pings if more than X warnings issued in 1h)</span></label>
+              <input type="number" id="al-threshold-warn" class="form-input" placeholder="5" min="1">
+            </div>
+            <div class="form-row" style="margin-top:14px">
+              <label>Ticket Spike Trigger <span style="font-size:12px;color:#5c5c78">(pings if more than X tickets opened in 1h)</span></label>
+              <input type="number" id="al-threshold-tickets" class="form-input" placeholder="10" min="1">
+            </div>
+          </div>
+          <div class="sys-module">
+            <div class="form-row">
+              <label>Roles to Ping <span style="font-size:12px;color:#5c5c78">(comma-separated Role IDs)</span></label>
+              <textarea id="al-roles" class="form-input" rows="2" placeholder="RoleID1, RoleID2..."></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TICKET SYSTEM -->
+      <div class="dash-panel" id="panel-tickets" style="display:none">
+        <div class="sys-module-header">
+          <div>
+            <div class="card-title" style="margin:0">🎫 Ticket System</div>
+            <div class="card-desc" style="margin:6px 0 0">Set up a support ticket system. Clicking the panel button
+              opens a private ticket channel.</div>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="saveTickets()">Save Changes</button>
+        </div>
+        <div class="sys-modules">
+          <div class="sys-module">
+            <div class="module-row">
+              <div>
+                <div class="module-title">Enable Ticket System</div>
+                <div class="module-desc">Allow members to open support tickets.</div>
+              </div>
+              <label class="toggle"><input type="checkbox" id="tk-enabled"><span class="toggle-slider"></span></label>
+            </div>
+          </div>
+          <div class="sys-module">
+            <div class="form-row">
+              <label>Ticket Panel Channel ID <span
+                  style="color:#5c5c78;font-weight:400;text-transform:none;letter-spacing:0">(where the open-ticket
+                  button is posted)</span></label>
+              <select id="tk-panel-ch" class="form-input">
+                <option value="">Loading channels...</option>
+              </select>
+            </div>
+            <div class="form-row" style="margin-top:14px">
+              <label>Ticket Category ID <span
+                  style="color:#5c5c78;font-weight:400;text-transform:none;letter-spacing:0">(new ticket channels
+                  created here)</span></label>
+              <input type="text" id="tk-category" class="form-input" placeholder="Category ID">
+            </div>
+            <div class="form-row" style="margin-top:14px">
+              <label>Support Role ID <span
+                  style="color:#5c5c78;font-weight:400;text-transform:none;letter-spacing:0">(role that can see all
+                  tickets)</span></label>
+              <input type="text" id="tk-support-role" class="form-input" placeholder="Role ID">
+            </div>
+          </div>
+          <div class="sys-module">
+            <div class="form-row">
+              <label>Ticket Open Message</label>
+              <textarea id="tk-open-msg" class="form-input" rows="3"
+                placeholder="Welcome to your ticket! A staff member will assist you shortly."></textarea>
+            </div>
+          </div>
+          <div class="sys-module">
+            <div class="module-row">
+              <div>
+                <div class="module-title">Save Ticket Transcripts</div>
+                <div class="module-desc">When a ticket is closed, save the conversation as a transcript.</div>
+              </div>
+              <label class="toggle"><input type="checkbox" id="tk-transcripts"><span
+                  class="toggle-slider"></span></label>
+            </div>
+            <div class="form-row" style="margin-top:12px">
+              <label>Transcript Log Channel ID</label>
+              <select id="tk-transcript-ch" class="form-input">
+                <option value="">Loading channels...</option>
+              </select>
+            </div>
+          </div>
+          <div class="sys-module">
+            <div class="module-row">
+              <div>
+                <div class="module-title">Max Open Tickets Per User</div>
+                <div class="module-desc">Limit how many tickets one user can have open at once.</div>
+              </div>
+              <div><input type="number" id="tk-max" class="form-input" placeholder="e.g. 1" min="1" max="5"
+                  style="max-width:100px;margin-top:8px"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CUSTOM COMMANDS -->
+      <div class="dash-panel" id="panel-customcommands" style="display:none">
+        <div class="sys-module-header">
+          <div>
+            <div class="card-title" style="margin:0">🤖 Custom Commands & Auto-Responder</div>
+            <div class="card-desc" style="margin:6px 0 0">Create your own commands (e.g. !rules) and automatic replies
+              for common questions.</div>
+          </div>
+          <button class="btn btn-secondary btn-sm" onclick="loadCustomCommands(currentGuild.id)">🔄 Refresh</button>
+        </div>
+        <div class="sys-modules">
+          <div class="sys-module"
+            style="padding:24px;background:rgba(255,255,255,0.02);border:1px dashed rgba(255,255,255,0.1);text-align:center;cursor:pointer;border-radius:12px;margin-bottom:20px"
+            onclick="showCustomCommandModal()">
+            <span style="font-size:1.5rem;display:block;margin-bottom:8px">+</span>
+            <span style="font-weight:600;color:var(--primary-color)">Create New Custom Command</span>
+          </div>
+          <div id="customCommandsList" style="display:flex;flex-direction:column;gap:15px">
+            <!-- Commands will be rendered here -->
+          </div>
+        </div>
+      </div>
+
+      <!-- STAFF REWARDS -->
+      <div class="dash-panel" id="panel-staffrewards" style="display:none">
+        <div class="sys-module-header">
+          <div>
+            <div class="card-title" style="margin:0">🏆 Staff Achievements & Role Rewards</div>
+            <div class="card-desc" style="margin:6px 0 0">Incentivize your staff with custom badges and automated
+              Discord roles based on their performance.</div>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="saveStaffRewards()">Save All Rewards</button>
+        </div>
+
+        <div class="sys-modules">
+          <!-- Achievements Section -->
+          <div class="card-title" style="font-size:1.1rem;margin:20px 0 10px 5px">🏅 Custom Achievements (Badges)</div>
+          <div id="achievementsList" style="display:flex;flex-direction:column;gap:12px;margin-bottom:20px">
+            <!-- Achievements rendered here -->
+          </div>
+          <div class="sys-module"
+            style="padding:15px;background:rgba(255,255,255,0.02);border:1px dashed rgba(255,255,255,0.1);text-align:center;cursor:pointer;border-radius:10px"
+            onclick="addAchievement()">
+            <span style="color:var(--primary-color);font-weight:600">+ Add New Achievement Badge</span>
+          </div>
+
+          <hr style="border:0;border-top:1px solid rgba(255,255,255,0.05);margin:30px 0">
+
+          <!-- Role Rewards Section -->
+          <div class="card-title" style="font-size:1.1rem;margin:20px 0 10px 5px">🎭 Automated Role Rewards</div>
+          <div id="roleRewardsList" style="display:flex;flex-direction:column;gap:12px;margin-bottom:20px">
+            <!-- Role rewards rendered here -->
+          </div>
+          <div class="sys-module"
+            style="padding:15px;background:rgba(255,255,255,0.02);border:1px dashed rgba(255,255,255,0.1);text-align:center;cursor:pointer;border-radius:10px"
+            onclick="addRoleReward()">
+            <span style="color:var(--primary-color);font-weight:600">+ Add New Role Reward</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ECONOMY & SHOP -->
+      <div class="dash-panel" id="panel-economy" style="display:none">
+        <div class="sys-module-header">
+          <div>
+            <div class="card-title" style="margin:0">💰 Economy & Point Multipliers</div>
+            <div class="card-desc" style="margin:6px 0 0">Configure your server's currency and reward multipliers.</div>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="saveEconomy()">Save Changes</button>
+        </div>
+        <div class="sys-modules">
+          <div class="sys-module">
+            <div class="module-title" style="font-size:1rem;margin-bottom:15px">Currency Settings</div>
+            <div class="form-row">
+              <label>Currency Name (e.g. Credits, Points, Gold)</label>
+              <input type="text" id="eco-name" class="form-input" placeholder="Points" style="max-width:300px">
+            </div>
+            <div class="form-row" style="margin-top:14px">
+              <label>Currency Symbol / Emoji</label>
+              <input type="text" id="eco-symbol" class="form-input" placeholder="💰" style="max-width:100px">
+            </div>
+          </div>
+          <div class="sys-module">
+             <div class="module-title" style="font-size:1rem;margin-bottom:15px">Global Multipliers</div>
+             <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+               <div class="form-row">
+                 <label>Shift Point Multiplier</label>
+                 <input type="number" id="eco-mult-shift" class="form-input" value="1.0" step="0.1" min="0.1">
+               </div>
+               <div class="form-row">
+                 <label>Event Point Multiplier</label>
+                 <input type="number" id="eco-mult-event" class="form-input" value="1.0" step="0.1" min="0.1">
+               </div>
+             </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CUSTOM BRANDING -->
+      <div class="dash-panel" id="panel-branding" style="display:none">
+        <div class="sys-module-header">
+          <div>
+            <div class="card-title" style="margin:0">🎨 Enterprise Custom Branding</div>
+            <div class="card-desc" style="margin:6px 0 0">White-label Strata with your server's own identity.</div>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="saveBranding()">Save Changes</button>
+        </div>
+        <div class="sys-modules">
+          <div class="sys-module">
+            <div class="form-row">
+              <label>Custom Bot Name (Display Only)</label>
+              <input type="text" id="brand-name" class="form-input" placeholder="e.g. Atlas Management">
+            </div>
+            <div class="form-row" style="margin-top:14px">
+              <label>Custom Embed Color (Hex Code)</label>
+              <input type="color" id="brand-color" class="form-input" style="height:44px;padding:4px">
+            </div>
+            <div class="form-row" style="margin-top:14px">
+              <label>Vanity Bot Avatar URL</label>
+              <input type="text" id="brand-avatar" class="form-input" placeholder="https://...">
+            </div>
+            <div class="form-row" style="margin-top:14px">
+              <label>Custom Footer Text</label>
+              <input type="text" id="brand-footer" class="form-input" placeholder="Custom branding footer...">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ACTIVITY LOG -->
+      <div class="dash-panel" id="panel-activitylog" style="display:none">
+        <div class="sys-module-header">
+          <div>
+            <div class="card-title" style="margin:0">📑 Global Activity Log</div>
+            <div class="card-desc" style="margin:6px 0 0">Real-time audit log of all system and staff actions.</div>
+          </div>
+          <button class="btn btn-secondary btn-sm" onclick="loadActivityLog(currentGuild.id)">🔄 Refresh</button>
+        </div>
+        <div class="table-wrap" style="margin-top:20px">
+          <table class="dash-table">
+            <thead>
+              <tr>
+                <th>Timestamp</th>
+                <th>Staff/System</th>
+                <th>Action</th>
+                <th>Details</th>
+              </tr>
+            </thead>
+            <tbody id="activitylogBody">
+               <!-- Logs will be loaded here -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- TICKET LOGS -->
+      <div class="dash-panel" id="panel-ticketlogs" style="display:none">
+        <div class="sys-module-header">
+          <div>
+            <div class="card-title" style="margin:0">🎫 Ticket Archive & Transcripts</div>
+            <div class="card-desc" style="margin:6px 0 0">View past support interactions and staff reports.</div>
+          </div>
+          <div style="display:flex;gap:10px">
+            <select id="ticketLogTypeFilter" class="form-input btn-sm" style="width:140px" onchange="loadTicketLogs(currentGuild.id)">
+              <option value="">All Types</option>
+              <option value="report_staff">Staff Reports</option>
+              <option value="feedback">Feedback</option>
+              <option value="support">Support</option>
+            </select>
+            <button class="btn btn-secondary btn-sm" onclick="loadTicketLogs(currentGuild.id)">🔄 Refresh</button>
+          </div>
+        </div>
+        <div class="table-wrap" style="margin-top:20px">
+          <table class="dash-table">
+            <thead>
+              <tr>
+                <th>Ticket ID</th>
+                <th>Member</th>
+                <th>Category</th>
+                <th>Status</th>
+                <th>Staff/Details</th>
+                <th>Created</th>
+              </tr>
+            </thead>
+            <tbody id="ticketlogsBody">
+               <!-- Tickets will be loaded here -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- SUBSCRIPTIONS -->
+      <div class="dash-panel" id="panel-subscription" style="display:none">
+        <div class="sys-module-header">
+          <div>
+            <div class="card-title" style="margin:0">💎 Server Subscription</div>
+            <div class="card-desc" style="margin:6px 0 0">Manage your active tier to unlock Premium and Enterprise modules natively in STRATA.</div>
+          </div>
+        </div>
+        <div class="sys-modules">
+          <div class="sys-module" style="background: rgba(108, 99, 255, 0.05); border: 1px solid rgba(108, 99, 255, 0.2)">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <div>
+                <h3 style="margin:0; font-size:1.2rem; display:flex; gap:10px; align-items:center">
+                  Current Plan: <span id="sub-active-tier" style="color:#00e096; text-transform:uppercase; font-weight:800">FREE</span>
+                </h3>
+                <p style="margin:10px 0 0; color:#5c5c78; font-size:13px">Upgrade to unlock native modular systems across the entire dashboard.</p>
+              </div>
+              <div style="display:flex;gap:10px">
+                 <button class="btn btn-primary" onclick="window.open('https://discord.gg/smNwftEhKe', '_blank')">Upgrade to Premium</button>
+                 <button class="btn btn-outline" style="border-color:#ff4757; color:#ff4757" onclick="window.open('https://discord.gg/smNwftEhKe', '_blank')">Upgrade to Enterprise</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ADVANCED ANALYTICS (STAGE 4) -->
+      <div class="dash-panel" id="panel-analytics-adv" style="display:none">
+        <div class="sys-module-header" style="margin-bottom:20px">
+          <div>
+            <div class="card-title" style="margin:0">📈 Advanced Server Analytics</div>
+            <div class="card-desc" style="margin:6px 0 0">Deep insights into staff performance, ticket trends, and activity heatmaps.</div>
+          </div>
+          <button class="btn btn-secondary btn-sm" onclick="loadAdvancedAnalytics(currentGuild.id)">🔄 Refresh Data</button>
+        </div>
+
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap:20px">
+          <div class="sys-module" style="padding:20px">
+            <div class="module-title" style="font-size:1rem;margin-bottom:15px">🕰️ Shift Activity Trends</div>
+            <div style="height:300px">
+              <canvas id="shiftTrendChart"></canvas>
+            </div>
+          </div>
+
+          <div class="sys-module" style="padding:20px">
+            <div class="module-title" style="font-size:1rem;margin-bottom:15px">🎫 Ticket Category Distribution</div>
+            <div style="height:300px">
+              <canvas id="ticketDistChart"></canvas>
+            </div>
+          </div>
+
+          <div class="sys-module" style="padding:20px">
+            <div class="module-title" style="font-size:1rem;margin-bottom:15px">⚠️ Warning Severity Analysis</div>
+            <div style="height:300px">
+              <canvas id="warningSevChart"></canvas>
+            </div>
+          </div>
+
+          <div class="sys-module" style="padding:20px">
+            <div class="module-title" style="font-size:1rem;margin-bottom:15px">🎖️ Staff Activity Milestones</div>
+            <div id="milestoneList" style="display:flex; flex-direction:column; gap:15px">
+              <div class="table-empty">Loading performance metrics...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DATA EXPORT (STAGE 4) -->
+      <div class="dash-panel" id="panel-dataexport" style="display:none">
+        <div class="sys-module-header" style="margin-bottom:20px">
+          <div>
+            <div class="card-title" style="margin:0">📥 Data Export & Reporting</div>
+            <div class="card-desc" style="margin:6px 0 0">Download your server's operational data for external audits or backup.</div>
+          </div>
+        </div>
+
+        <div class="sys-modules" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap:20px">
+          <div class="sys-module" style="text-align:center; padding:30px">
+            <div style="font-size:2.5rem; margin-bottom:15px">👥</div>
+            <h3>Staff Roster</h3>
+            <p class="card-desc" style="margin-bottom:20px">Complete list of staff members, ranks, and total points.</p>
+            <button class="btn btn-primary" style="width:100%" onclick="exportData('staff')">Download CSV</button>
+          </div>
+          <div class="sys-module" style="text-align:center; padding:30px">
+            <div style="font-size:2.5rem; margin-bottom:15px">⏱️</div>
+            <h3>Shift Logs</h3>
+            <p class="card-desc" style="margin-bottom:20px">All clock-in/out records including durations and breaks.</p>
+            <button class="btn btn-primary" style="width:100%" onclick="exportData('shifts')">Download CSV</button>
+          </div>
+          <div class="sys-module" style="text-align:center; padding:30px">
+            <div style="font-size:2.5rem; margin-bottom:15px">🎫</div>
+            <h3>Ticket Archive</h3>
+            <p class="card-desc" style="margin-bottom:20px">Full history of closed tickets and transcripts.</p>
+            <button class="btn btn-primary" style="width:100%" onclick="exportData('tickets')">Download CSV</button>
+          </div>
+          <div class="sys-module" style="text-align:center; padding:30px">
+            <div style="font-size:2.5rem; margin-bottom:15px">⚠️</div>
+            <h3>Warning History</h3>
+            <p class="card-desc" style="margin-bottom:20px">Complete audit trail of all warnings issued and revoked.</p>
+            <button class="btn btn-primary" style="width:100%" onclick="exportData('warnings')">Download CSV</button>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- MODALS -->
+  <div class="modal-overlay" id="addStaffModal" onclick="if(event.target===this) closeAddStaffModal()">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title">Hire New Staff Member</div>
+        <button class="modal-close" onclick="closeAddStaffModal()">&times;</button>
+      </div>
+      <div class="form-row">
+        <label>Search Members</label>
+        <div class="cmd-search-wrap" style="max-width:100%">
+          <span class="cmd-search-icon">🔍</span>
+          <input type="text" class="cmd-input" id="staffSearchInput" placeholder="Username or User ID..." oninput="searchMembersToHire()">
+        </div>
+      </div>
+      <div class="search-results" id="staffSearchResults">
+        <!-- Results here -->
+      </div>
+      <div id="addStaffForm" style="display:none;margin-top:20px;padding-top:20px;border-top:1px solid var(--border)">
+        <div class="form-row">
+          <label>Assign Rank</label>
+          <select id="addStaffRank" class="form-input">
+            <option value="trial">Trial Staff</option>
+            <option value="moderator">Moderator</option>
+            <option value="admin">Administrator</option>
+            <option value="manager">Manager</option>
+          </select>
+        </div>
+        <button class="btn btn-primary" style="width:100%;margin-top:10px" onclick="submitAddStaff()">Confirm Hiring</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="manageStaffModal" onclick="if(event.target===this) closeManageStaffModal()">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title" id="manageStaffTitle">Manage Staff Member</div>
+        <button class="modal-close" onclick="closeManageStaffModal()">&times;</button>
+      </div>
+      <input type="hidden" id="manageStaffUserId">
+      <div class="form-row">
+        <label>Staff Rank</label>
+        <select id="manageStaffRank" class="form-input">
+          <option value="trial">Trial Staff</option>
+          <option value="moderator">Moderator</option>
+          <option value="admin">Administrator</option>
+          <option value="manager">Manager</option>
+        </select>
+      </div>
+      <div class="form-row" style="margin-top:20px">
+        <label>Adjust Points</label>
+        <div style="display:flex;gap:10px">
+          <select id="managePointsAction" class="form-input" style="max-width:100px">
+            <option value="add">Add</option>
+            <option value="remove">Remove</option>
+            <option value="set">Set</option>
+          </select>
+          <input type="number" id="managePointsValue" class="form-input" placeholder="Value">
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:30px">
+        <button class="btn btn-primary" onclick="submitUpdateStaff()">Save Changes</button>
+            <div class="form-row" style="margin-top:20px">
+              <label>Adjust Points</label>
+              <div style="display:flex;gap:10px">
+                <select id="managePointsAction" class="form-input" style="max-width:100px">
+                  <option value="add">Add</option>
+                  <option value="remove">Remove</option>
+                  <option value="set">Set</option>
+                </select>
+                <input type="number" id="managePointsValue" class="form-input" placeholder="Value">
+              </div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:30px">
+              <button class="btn btn-primary" onclick="submitUpdateStaff()">Save Changes</button>
+              <button class="btn btn-outline" style="color:var(--red)" onclick="submitRemoveStaff()">Remove Staff</button>
+            </div>
+          </div>
+        </div>
+
+  <!-- MODERATION ACTION MODAL -->
+  <div id="modActionModal" class="modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:2000;align-items:center;justify-content:center;">
+    <div class="modal-content" style="background:#1a1a2e;border:1px solid #5c5c78;padding:30px;border-radius:15px;width:100%;max-width:450px;position:relative;">
+      <div class="card-title" id="modModalTitle">⚠️ Issue Punishment</div>
+      <div class="card-desc" style="margin-bottom:20px">Fill out the details below to issue this action.</div>
+      
+      <div class="settings-form">
+        <input type="hidden" id="modActionType">
+        <div class="form-row">
+          <label>Target User ID</label>
+          <input type="text" id="modTargetId" class="form-input" placeholder="e.g. 1234567890">
+        </div>
+        <div class="form-row">
+          <label>Target Username (Optional)</label>
+          <input type="text" id="modTargetUsername" class="form-input" placeholder="e.g. NaughtyUser">
+        </div>
+        <div class="form-row">
+          <label>Reason</label>
+          <textarea id="modReason" class="form-input" rows="3" placeholder="Explain why this action is being taken..."></textarea>
+        </div>
+        <div class="form-row" id="modDurationRow" style="display:none">
+          <label>Duration (Minutes)</label>
+          <input type="number" id="modDuration" class="form-input" placeholder="e.g. 60" min="1">
+        </div>
+        
+        <div style="display:flex;gap:10px;margin-top:20px">
+          <button class="btn btn-primary" style="flex:1" onclick="submitModAction()">Issue Action</button>
+          <button class="btn btn-secondary" style="flex:1" onclick="closeModModal()">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="customCommandModal" onclick="if(event.target===this) closeCustomCommandModal()">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title" id="cmdModalTitle">Create Custom Command</div>
+        <button class="modal-close" onclick="closeCustomCommandModal()">&times;</button>
+      </div>
+      <input type="hidden" id="cmdId">
+      <div class="form-row">
+        <label>Command Trigger / Keyword</label>
+        <input type="text" id="cmdTrigger" class="form-input" placeholder="e.g. !discord or hello">
+      </div>
+      <div class="form-row" style="margin-top:14px">
+        <label>Command Response</label>
+        <textarea id="cmdResponse" class="form-input" rows="4" placeholder="What should the bot say?"></textarea>
+      </div>
+      <div class="form-row" style="margin-top:14px">
+        <label>Match Type</label>
+        <select id="cmdMatchType" class="form-input">
+          <option value="exact">Exact Match (Trigger must match exactly)</option>
+          <option value="starts">Starts With (Message must start with trigger)</option>
+          <option value="contains">Contains (Message must contain trigger)</option>
+        </select>
+      </div>
+      <div class="module-row" style="margin-top:14px">
+        <div>
+          <div class="module-title">Send as Embed</div>
+          <div class="module-desc">Wrap the response in a stylized embed box.</div>
+        </div>
+        <label class="toggle"><input type="checkbox" id="cmdIsEmbed" checked><span class="toggle-slider"></span></label>
+      </div>
+      <div class="module-row" style="margin-top:14px">
+        <div>
+          <div class="module-title">Command Enabled</div>
+        </div>
+        <label class="toggle"><input type="checkbox" id="cmdEnabled" checked><span class="toggle-slider"></span></label>
+      </div>
+      <button class="btn btn-primary" style="width:100%;margin-top:20px" onclick="submitCustomCommand()">Save Command</button>
+    </div>
+  </div>
+</body>
+
+  <script src="app.js"></script>
+</html>
