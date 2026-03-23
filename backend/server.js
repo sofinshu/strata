@@ -5,6 +5,7 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 const path = require('path');
+const fs = require('fs');
 
 const db = require('./database/connection');
 require('./bot');
@@ -21,6 +22,10 @@ app.set("trust proxy", 1);
 
 const PORT = parseInt(process.env.PORT || (process.env.NODE_ENV === 'development' ? "5000" : "3000"), 10);
 const NODE_ENV = process.env.NODE_ENV || 'development';
+
+const legacyDir = path.join(__dirname, '..', 'legacy');
+const indexPath = path.join(legacyDir, 'index.html');
+const indexExists = fs.existsSync(indexPath);
 
 // IMMEDIATE Health check for Railway - BEFORE any middlewares
 app.get('/health', (req, res) => {
@@ -68,7 +73,7 @@ app.use(express.urlencoded({ extended: true }));
 // Logging
 app.use(morgan(NODE_ENV === 'production' ? 'combined' : 'dev'));
 
-// STEP 9: Integrated Connection Routes
+// Integrated Connection Routes
 const { EmbedBuilder } = require('discord.js');
 const { client } = require('./bot');
 
@@ -92,8 +97,6 @@ app.post('/api/send-embed', async (req, res) => {
         res.status(500).json({ success: false, error: error.message });
     }
 });
-
-// Redundant /api/settings/welcome removed - handled by systemRoutes
 
 app.get('/api/servers/:serverId/channels', async (req, res) => {
     try {
@@ -126,27 +129,11 @@ app.use('/api/dashboard/guild/:guildId', systemRoutes);
 app.use('/api/subscription', monetizationRoutes);
 app.use('/api/health', healthRoutes);
 
-// Serve static files (frontend) in production
-// Debug endpoint to check bot status
-app.get('/api/debug/bot', async (req, res) => {
-    try {
-        res.json({
-            ready: client.isReady(),
-            tag: client.user?.tag,
-            guilds: client.guilds.cache.size,
-            guildList: client.guilds.cache.map(g => ({ id: g.id, name: g.name })),
-            uptime: Math.floor(process.uptime())
-        });
-    } catch (e) {
-        res.status(500).json({ error: e.message });
-    }
-});
-
-if (NODE_ENV === 'production') {
-    app.use(express.static(path.join(__dirname, '..')));
-
+// Static files (legacy frontend)
+if (indexExists) {
+    app.use(express.static(legacyDir));
     app.get('*', (req, res) => {
-        res.sendFile(path.join(__dirname, '..', 'index.html'));
+        res.sendFile(indexPath);
     });
 }
 
