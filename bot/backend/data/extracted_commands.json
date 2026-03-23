@@ -1,0 +1,7 @@
+[
+    {
+        "name":  "help",
+        "desc":  "Display interactive command browser organized by categories",
+        "tier":  "Free"
+    }
+]
