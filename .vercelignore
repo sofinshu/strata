@@ -1,19 +1,8 @@
-bot/
-backend/
-legacy/
-extracted_commands.json
-update_commands.js
-start.sh
-STRATA_DASHBOARD_SPEC.md
-.git
-.gitignore
-.vercelignore
-next.config.js.bak
-tsconfig.json.bak
-next.config.mjs
-nextjs.log
-frontend.log
-backend.log
-dev.log
-server.log
-server.pid
+# root-level ignore list for monorepo
+# Keep only the bot subdirectory for the Next.js project
+*
+!bot/
+!bot/**
+
+# Keep version control around just in case
+!.gitignore
