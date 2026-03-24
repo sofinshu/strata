@@ -1,0 +1,8 @@
+[build]
+buildCommand = "cd bot && npm install && cd backend && npm install"
+
+[deploy]
+startCommand = "node bot/backend/server.js"
+healthcheckPath = "/health"
+healthcheckTimeout = 30
+restartPolicyType = "on_failure"
