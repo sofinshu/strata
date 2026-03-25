@@ -29,16 +29,13 @@ const models = [
   {
     id: 'gemini-pro',
     name: 'Gemini Pro',
-    description: 'Google\'s advanced reasoning model.',
+    description: "Google's advanced reasoning model.",
     isFree: false,
   },
-  // Add more models as needed
 ];
 
 export async function GET() {
   try {
-    // Simulate a delay or any async operation if needed
-    // In a real scenario, you might fetch from a database or external API
     return NextResponse.json(models);
   } catch (error) {
     console.error('Error fetching models:', error);

@@ -7,13 +7,7 @@ start.sh
 STRATA_DASHBOARD_SPEC.md
 .git
 .gitignore
-.vercelignore
+*.log
+server.pid
 next.config.js.bak
 tsconfig.json.bak
-next.config.mjs
-nextjs.log
-frontend.log
-backend.log
-dev.log
-server.log
-server.pid
