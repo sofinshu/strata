@@ -2,6 +2,14 @@
   "name": "strata-monorepo",
   "version": "1.0.0",
   "private": true,
+  "scripts": {
+    "dev": "cd bot && npm run dev",
+    "build": "cd bot && npm run build",
+    "start": "cd bot && npm run start"
+  },
+  "dependencies": {
+    "next": "14.1.0"
+  },
   "engines": {
     "node": ">=18.0.0"
   }

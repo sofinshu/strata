@@ -1,0 +1,5 @@
+{
+  "buildCommand": "cd bot && npm install && npm run build",
+  "outputDirectory": "bot/.next",
+  "framework": "nextjs"
+}
