@@ -1,8 +1,8 @@
 # root-level ignore list for monorepo
 # Keep only the bot subdirectory for the Next.js project
-*
 !bot/
 !bot/**
-
-# Keep version control around just in case
+!package.json
+!vercel.json
 !.gitignore
+
