@@ -1,5 +1,14 @@
 {
-  "buildCommand": "cd bot && npm install && npm run build",
-  "outputDirectory": "bot/.next",
-  "framework": "nextjs"
+  "builds": [
+    {
+      "src": "backend/server.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "backend/server.js"
+    }
+  ]
 }
